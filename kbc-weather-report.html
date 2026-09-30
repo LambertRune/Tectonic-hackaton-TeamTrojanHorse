@@ -1,0 +1,759 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>KBC Weather Report – working concept</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:opsz,wght@6..12,300;6..12,400;6..12,600;6..12,700;6..12,800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#111315; --card:#1E2022; --card2:#26292C; --line:#2C3034;
+  --text:#F2F4F5; --muted:#A3AAB1; --dim:#6F777F;
+  --blue:#1A9FE4; --green:#5BA215; --teal:#0E9E83;
+  --yellow:#E9C100; --orange:#F69D14; --red:#D64040; --rain:#74C8ED; --chip:#1D2A33;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{background:#05080B;color:var(--text);font-family:"Nunito Sans",-apple-system,"Segoe UI",sans-serif;display:flex;align-items:center;justify-content:center;gap:36px;min-height:100vh;overflow:hidden}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+[data-go],[data-act],[data-tog]{cursor:pointer}
+
+/* ---------- presenter ---------- */
+.panel{width:270px;display:flex;flex-direction:column;gap:10px;max-height:94vh}
+.panel h1{font-size:20px;font-weight:800}
+.panel .hint{font-size:12.5px;color:var(--muted);line-height:1.45}
+.personas{display:grid;grid-template-columns:repeat(5,1fr);gap:4px;background:#0E1318;border:1px solid #1E262E;border-radius:10px;padding:4px}
+.personas button{font-size:12px;padding:7px 2px;border-radius:7px;color:var(--muted);font-weight:700}
+.personas button.on{background:var(--blue);color:#051018}
+.plabel{font-size:13px;color:var(--muted);line-height:1.4;padding:2px 2px 0}
+.plabel b{color:var(--text)}
+.scenes{display:flex;flex-direction:column;gap:6px;overflow-y:auto}
+.scene{display:flex;gap:10px;align-items:center;text-align:left;padding:9px 11px;border-radius:10px;background:#12171C;border:1px solid #1E262E;font-size:14px}
+.scene b{display:inline-grid;place-items:center;width:22px;height:22px;border-radius:50%;background:#1E262E;font-size:11.5px;flex:none}
+.scene.on{border-color:var(--blue);background:#0E2231}
+.scene.on b{background:var(--blue);color:#051018}
+.scene small{display:block;color:var(--muted);font-size:12px}
+.navrow{display:flex;gap:6px}
+.navrow button{flex:1;white-space:nowrap;padding:8px;border-radius:9px;background:#12171C;border:1px solid #1E262E;font-size:13px;color:var(--muted)}
+.disclaimer{font-size:11px;color:var(--dim);line-height:1.4}
+
+/* ---------- phone ---------- */
+.stage{transform-origin:center center}
+.phone{width:390px;height:844px;border-radius:54px;background:var(--bg);position:relative;overflow:hidden;box-shadow:0 0 0 10px #1a1d20,0 0 0 11px #2a2e33,0 30px 80px rgba(0,0,0,.6)}
+.screen{position:absolute;inset:0;display:flex;flex-direction:column}
+.status{height:50px;flex:none;display:flex;align-items:flex-end;justify-content:space-between;padding:0 32px 6px 46px;font-weight:700;font-size:16px}
+.scroll{flex:1;overflow-y:auto;overflow-x:hidden;padding-bottom:110px;scrollbar-width:none}
+.scroll::-webkit-scrollbar{display:none}
+.top{display:flex;align-items:center;gap:10px;padding:10px 16px 8px}
+.iconbtn{width:30px;height:30px;display:grid;place-items:center;color:var(--text)}
+.search{flex:1;height:40px;border-radius:20px;background:#1A1C1E;border:1px solid #2A2D30;display:flex;align-items:center;gap:8px;padding:0 12px;color:var(--muted);font-size:15px}
+.kate{display:inline-flex;align-items:center;gap:4px;font-weight:800;color:var(--text);font-size:15px;margin-left:auto}
+.klogo{width:16px;height:16px;border-radius:50%;background:#E6F6FF;display:inline-grid;place-items:center;flex:none}
+.bell{position:relative;color:var(--blue)}
+.bell.dot::after{content:"";position:absolute;top:1px;right:2px;width:9px;height:9px;border-radius:50%;background:var(--red)}
+.chips{display:flex;gap:8px;padding:6px 16px 10px;overflow:hidden}
+.chip{height:32px;border-radius:16px;background:var(--chip);display:flex;align-items:center;gap:6px;padding:0 12px;font-size:14px;color:#C9D1D9;white-space:nowrap}
+.chip.sel{background:#E9E9E9;color:#111}
+.accts{display:flex;gap:10px;padding:6px 16px 0;overflow:hidden}
+.acct{width:128px;flex:none;border-radius:10px;background:var(--card);overflow:hidden}
+.acct .img{height:92px;position:relative;overflow:hidden}
+.acct .img span{position:absolute;left:12px;bottom:12px;font-size:20px;font-weight:800;color:#fff}
+.acct .nm{font-size:12.5px;color:var(--muted);padding:10px 10px 2px;text-transform:uppercase}
+.acct .bal{font-size:15px;font-weight:700;padding:0 10px 12px}
+.acct.sel{box-shadow:inset 0 -3px 0 var(--text)}
+.acct.small{width:112px;display:flex;flex-direction:column;gap:8px;justify-content:center;padding:12px;font-size:14px;color:var(--muted)}
+.tx{padding:12px 16px 4px}
+.tx div{display:flex;gap:14px;font-size:15px;padding:5px 0}
+.tx .d{color:var(--muted);width:40px;font-size:13px;padding-top:2px;flex:none}
+.tx .a{margin-left:auto;font-weight:600;white-space:nowrap}
+.tx .a.p{color:#7ED957}
+.tx .hl{background:#1B2A36;border-radius:8px;margin:0 -8px;padding:5px 8px}
+.link{color:var(--blue);font-weight:700;font-size:14px}
+.sec{padding:22px 16px 0}
+.sechead{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:12px}
+.sechead h2{font-size:18px;font-weight:400}
+.card{background:var(--card);border-radius:10px;padding:16px;position:relative}
+.card + .card{margin-top:12px}
+.x{position:absolute;top:12px;right:12px;width:22px;height:22px;border-radius:50%;background:#2A3238;display:grid;place-items:center;font-size:11px;color:var(--muted)}
+.tip{display:flex;gap:14px}
+.tip .ic{width:34px;flex:none;color:#C8CDD2;padding-top:2px}
+.tip .t{font-size:15px;line-height:1.55}
+.tiph{display:flex;align-items:center;gap:6px;font-weight:700;font-size:14.5px;margin-bottom:4px}
+.dot{position:absolute;left:-6px;top:-4px;width:9px;height:9px;border-radius:50%;background:var(--red)}
+.wx{background:linear-gradient(160deg,#1C2B38 0%,#1E2022 55%);border:1px solid #243644}
+.wxtop{display:flex;align-items:center;gap:6px;font-weight:700;font-size:14.5px}
+.tag{margin-left:auto;font-size:11.5px;font-weight:700;background:var(--teal);color:#fff;border-radius:6px;padding:2px 7px}
+.wxnow{display:flex;align-items:center;gap:14px;margin:12px 0 6px}
+.temp{font-size:40px;font-weight:800;line-height:1;letter-spacing:-1px}
+.sub{font-size:13px;color:var(--muted);line-height:1.35}
+.wxnow .lbl{margin-left:auto;text-align:right;font-size:14px;font-weight:700}
+.wxnow .lbl small{display:block;font-weight:400;color:var(--muted);font-size:12.5px}
+.wxhead{font-size:15px;line-height:1.45;margin:6px 0 12px}
+.week{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;text-align:center;border-top:1px solid var(--line);padding-top:12px}
+.week .dn{font-size:12px;color:var(--muted);margin-bottom:4px}
+.week .dn.today{color:var(--text);font-weight:700}
+.week .amt{font-size:11px;color:var(--muted);margin-top:2px;min-height:14px}
+.pill{display:inline-flex;align-items:center;justify-content:center;gap:6px;height:38px;padding:0 18px;border-radius:19px;border:1.5px solid var(--blue);color:var(--blue);font-size:16px;font-weight:600;white-space:nowrap}
+.pill.fill{background:var(--blue);color:#06131C}
+.pill.sm{height:34px;font-size:14.5px;padding:0 14px}
+.pill.ghost{border-color:#3A3F44;color:var(--muted)}
+.pills{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.inuit .row{display:flex;gap:30px;margin:14px 0}
+.inuit .kpi{display:flex;gap:10px;align-items:center}
+.inuit .sq{width:40px;height:40px;border-radius:9px;display:grid;place-items:center}
+.inuit .kpi small{color:var(--muted);font-size:14px;display:block}
+.bars{display:flex;justify-content:space-between;align-items:flex-end;height:100px;border-bottom:1px solid var(--line);padding:0 12px}
+.bars .m{display:flex;gap:3px;align-items:flex-end}
+.bars i{display:block;width:7px;border-radius:4px 4px 0 0}
+.months{display:flex;justify-content:space-between;padding:8px 6px 0;font-size:13px;color:var(--muted)}
+.tabbar{position:absolute;left:0;right:0;bottom:0;height:86px;background:#141618;border-top:1px solid #1C1F22;display:flex;justify-content:space-around;padding-top:8px;z-index:4}
+.tab{display:flex;flex-direction:column;align-items:center;gap:4px;font-size:12px;color:#9AA0A6;width:70px}
+.tab.on{color:#fff}
+.home{position:absolute;bottom:8px;left:50%;transform:translateX(-50%);width:134px;height:5px;border-radius:3px;background:#fff;z-index:6}
+.fab{position:absolute;right:16px;bottom:100px;width:56px;height:56px;border-radius:50%;background:var(--blue);display:grid;place-items:center;color:#06131C;box-shadow:0 6px 18px rgba(0,0,0,.4);z-index:5}
+.subhead{display:flex;align-items:center;justify-content:space-between;padding:10px 16px 12px;flex:none}
+.subhead h3{font-size:17px;font-weight:600}
+.subhead .iconbtn{color:var(--blue)}
+.hero{padding:6px 16px 0}
+.hero .big{display:flex;gap:16px;align-items:center}
+.hero h2{font-size:21px;font-weight:800;line-height:1.28}
+.hero p{color:var(--muted);font-size:14.5px;line-height:1.5;margin-top:8px}
+.temp2{display:flex;align-items:baseline;gap:8px;margin-top:10px;flex-wrap:wrap}
+.temp2 b{font-size:34px;font-weight:800;letter-spacing:-1px}
+.temp2 span{color:var(--muted);font-size:14px}
+.delta{font-size:13px;font-weight:700;border-radius:6px;padding:2px 7px}
+.strip{display:flex;gap:8px;overflow-x:auto;padding:14px 16px 4px;scrollbar-width:none}
+.strip::-webkit-scrollbar{display:none}
+.day{flex:none;width:62px;border-radius:10px;background:var(--card);padding:10px 4px 8px;text-align:center;border:1.5px solid transparent}
+.day.sel{border-color:var(--blue)}
+.day .dn{font-size:12px;color:var(--muted)}
+.day .dd{font-size:13px;font-weight:700;margin-bottom:6px}
+.day .ev{font-size:11px;color:var(--muted);margin-top:4px;min-height:14px;white-space:nowrap}
+.dayinfo{margin:10px 16px 0;background:var(--card);border-radius:10px;padding:14px 16px;font-size:14.5px;line-height:1.5}
+.dayinfo b{display:block;font-size:15px;margin-bottom:2px}
+.dayinfo ul{margin-top:6px;padding-left:18px;color:var(--muted);font-size:13.5px}
+.chart svg{display:block;width:100%}
+.legend{display:flex;justify-content:space-between;font-size:12px;color:var(--muted);margin-top:4px}
+.toggle{display:flex;align-items:center;gap:12px;padding:12px 0;border-top:1px solid var(--line)}
+.toggle:first-child{border-top:0}
+.toggle .tx2{flex:1;font-size:15px;line-height:1.35}
+.toggle .tx2 small{display:block;color:var(--muted);font-size:13px}
+.sw{width:50px;height:30px;border-radius:15px;background:#3A3F44;position:relative;flex:none;transition:.2s}
+.sw::after{content:"";position:absolute;top:3px;left:3px;width:24px;height:24px;border-radius:50%;background:#fff;transition:.2s}
+.sw.on{background:var(--blue)}
+.sw.on::after{left:23px}
+.emoji{width:34px;height:34px;border-radius:9px;background:#2A2D30;display:grid;place-items:center;font-size:17px;flex:none}
+.goal .bar{height:8px;border-radius:4px;background:#2E3337;margin:10px 0 8px;overflow:hidden}
+.goal .bar i{display:block;height:100%;background:var(--green);border-radius:4px;transition:width .4s}
+.fine{font-size:12.5px;color:var(--dim);padding:14px 16px 0;line-height:1.45}
+.warnbox{margin:12px 16px 0;border-radius:10px;padding:12px 14px;background:#3A1718;border:1px solid #6B2626;font-size:14px;line-height:1.45}
+.orange{background:linear-gradient(150deg,#4A2A08,#261708);border:1px solid #8A5510}
+.orange .h{color:#FFC78A}
+.lock{background:radial-gradient(120% 80% at 50% 0%,#20507A 0%,#0E2238 45%,#070D14 100%)}
+.clock{text-align:center;margin-top:34px}
+.clock .dte{font-size:19px;font-weight:600;color:#DDE7F0}
+.clock .tm{font-size:92px;font-weight:300;line-height:1.05;letter-spacing:-2px}
+.notif{margin:auto 12px 150px;border-radius:22px;background:rgba(40,52,64,.72);backdrop-filter:blur(20px);padding:14px 16px;display:flex;gap:12px;animation:slide .6s ease-out both .3s}
+@keyframes slide{from{transform:translateY(30px);opacity:0}to{transform:none;opacity:1}}
+.appic{width:38px;height:38px;border-radius:9px;background:linear-gradient(145deg,#1FA6EA,#0B6FB0);display:grid;place-items:center;flex:none}
+.notif .h{display:flex;justify-content:space-between;font-size:14px;font-weight:700}
+.notif .h span{font-weight:400;color:#C3CDD6;font-size:13px}
+.notif .b{font-size:14.5px;line-height:1.4;margin-top:2px;color:#EEF3F7}
+.lockhint{position:absolute;bottom:40px;width:100%;text-align:center;font-size:13px;color:#9FB3C6}
+.chatwrap{flex:1;overflow-y:auto;padding:0 16px 16px;scrollbar-width:none}
+.chatwrap::-webkit-scrollbar{display:none}
+.chatday{text-align:center;font-size:14px;margin-top:12px}
+.chatai{text-align:center;color:var(--blue);font-size:14px;margin:4px 0 18px}
+.msg{font-size:16px;line-height:1.55;margin:8px 0}
+.kav{width:30px;height:30px;border-radius:50%;background:#E6F6FF;display:grid;place-items:center;margin:14px 0 6px}
+.mini{background:var(--card);border-radius:12px;padding:14px;margin:10px 0}
+.mini .mw{display:grid;grid-template-columns:repeat(5,1fr);text-align:center;gap:4px;margin-top:10px}
+.mini .mw small{display:block;font-size:12px;color:var(--muted)}
+.mini .mw em{display:block;font-style:normal;font-size:11.5px;color:var(--muted);margin-top:2px}
+.input{margin:0 16px 30px;height:50px;border-radius:25px;border:1px solid #3A3F44;display:flex;align-items:center;padding:0 5px 0 18px;color:var(--muted);font-size:16px;flex:none}
+.input .mic{margin-left:auto;width:42px;height:42px;border-radius:50%;background:var(--blue);display:grid;place-items:center;color:#06131C}
+.typing span{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--muted);margin-right:4px;animation:blink 1s infinite}
+.typing span:nth-child(2){animation-delay:.2s}.typing span:nth-child(3){animation-delay:.4s}
+@keyframes blink{50%{opacity:.25}}
+.appear{animation:up .45s ease-out both}
+@keyframes up{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.alertband{margin:4px 16px 0;border-radius:12px;background:linear-gradient(150deg,#5A1416,#2B0D0E);border:1px solid #8C2A2A;padding:16px}
+.alertband .h,.orange .h{display:flex;align-items:center;gap:10px;font-weight:800;font-size:13px;letter-spacing:.6px;text-transform:uppercase;color:#FFB4B0}
+.alertband h2,.orange h2{font-size:20px;line-height:1.3;margin-top:10px;font-weight:800}
+.alertband p,.orange p{font-size:14.5px;color:#F1D2D0;margin-top:6px;line-height:1.5}
+.orange p{color:#F3DFC6}
+.kv{display:flex;justify-content:space-between;gap:10px;padding:10px 0;border-top:1px solid var(--line);font-size:14.5px}
+.kv:first-child{border-top:0}
+.kv span{color:var(--muted)}
+.kv b{text-align:right;font-weight:600}
+.shield{display:flex;gap:10px;align-items:flex-start;background:#3A2A12;border:1px solid #7A5310;border-radius:10px;padding:10px 12px;font-size:14px;line-height:1.45;margin-top:10px}
+.sig{display:flex;gap:10px;font-size:14.5px;line-height:1.45;padding:7px 0}
+.sig i{width:8px;height:8px;border-radius:50%;background:var(--red);flex:none;margin-top:7px}
+.avatar{width:40px;height:40px;border-radius:50%;display:grid;place-items:center;font-weight:800;flex:none}
+.stack{display:flex;flex-direction:column;gap:10px;padding:16px}
+.stack .pill{height:46px;font-size:16px}
+.textbtn{color:var(--muted);font-size:14px;text-align:center;text-decoration:underline;padding:6px}
+.sheet{position:absolute;inset:0;background:rgba(0,0,0,.55);display:flex;align-items:flex-end;z-index:20}
+.sheet .in{background:#1A1C1E;border-radius:20px 20px 0 0;padding:18px 18px 40px;width:100%;max-height:86%;overflow-y:auto;animation:up .3s ease-out}
+.grab{width:40px;height:5px;border-radius:3px;background:#3A3F44;margin:0 auto 14px}
+.sheet h4{font-size:18px;margin-bottom:8px}
+.why{font-size:14px;color:var(--muted);line-height:1.5}
+.why li{margin:4px 0 0 18px}
+.lex{display:grid;grid-template-columns:34px 1fr;gap:10px 12px;align-items:start;font-size:14px;line-height:1.4}
+.lex b{display:block}
+.lex span{color:var(--muted)}
+.toast{position:absolute;left:16px;right:16px;bottom:104px;background:#1F3A14;border:1px solid #3E7A1E;color:#D9F5C8;border-radius:10px;padding:12px 14px;font-size:14px;z-index:30;animation:up .3s ease-out}
+.check{display:flex;gap:12px;padding:11px 0;border-top:1px solid var(--line);font-size:14.5px;line-height:1.45}
+.check:first-child{border-top:0}
+.check .ck{width:24px;height:24px;border-radius:50%;display:grid;place-items:center;flex:none;font-size:13px;font-weight:800}
+.check small{display:block;color:var(--muted);font-size:13px}
+.save{display:flex;gap:12px;align-items:flex-start;padding:14px 0;border-top:1px solid var(--line)}
+.save:first-child{border-top:0}
+.save .amt{margin-left:auto;text-align:right;font-weight:800;color:#8CD656;white-space:nowrap;font-size:15px}
+.save .amt small{display:block;font-weight:400;color:var(--muted);font-size:12px}
+.save .tx2{font-size:14.5px;line-height:1.45}
+.save .tx2 b{display:block;font-size:15px}
+.save .tx2 span{color:var(--muted)}
+.save.done{opacity:.55}
+.seg{display:flex;background:#1A1C1E;border:1px solid #2A2D30;border-radius:10px;padding:3px;gap:3px}
+.seg button{flex:1;padding:7px;border-radius:7px;font-size:13.5px;color:var(--muted);font-weight:600}
+.seg button.on{background:#2E3A45;color:var(--text)}
+input[type=range]{width:100%;accent-color:var(--blue)}
+.code{background:#0B0E11;border:1px solid #242A30;border-radius:10px;padding:12px;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:11.5px;line-height:1.5;color:#C9D6E2;white-space:pre-wrap;word-break:break-word}
+.code .m{color:#74C8ED}.code .ok{color:#8CD656}.code .no{color:#FF8A85}.code .k{color:#E9C100}
+.zorg{margin:4px 16px 0;border-radius:12px;padding:16px;background:linear-gradient(160deg,#243040,#1B2129);border:1px solid #33475C}
+.zorg h2{font-size:20px;font-weight:800;margin-top:8px}
+.zorg p{color:#C6D3DF;font-size:14.5px;line-height:1.5;margin-top:6px}
+
+/* ---------- motor ---------- */
+.motor{display:none;width:min(1060px,calc(100vw - 360px));max-height:94vh;overflow-y:auto;background:#0B0F13;border:1px solid #1E262E;border-radius:18px;padding:26px 28px}
+.motor h2{font-size:24px;font-weight:800}
+.motor .lead{color:var(--muted);font-size:14.5px;margin-top:6px;line-height:1.5;max-width:720px}
+.mctl{display:flex;gap:12px;align-items:center;margin:18px 0}
+.mctl .seg{width:340px}
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.kpi2{background:#12181E;border:1px solid #1E262E;border-radius:12px;padding:14px 16px}
+.kpi2 small{color:var(--muted);font-size:12.5px;display:block}
+.kpi2 b{font-size:26px;font-weight:800;display:block;margin-top:4px;letter-spacing:-.5px}
+.kpi2 span{font-size:12.5px;color:var(--muted)}
+.pipe{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin:16px 0}
+.pipe div{background:#12181E;border:1px solid #1E262E;border-radius:10px;padding:10px 12px;position:relative;font-size:13px}
+.pipe div b{display:block;font-size:17px;margin-top:4px}
+.pipe div small{color:var(--muted);font-size:11.5px}
+.pipe div.acc{border-color:var(--blue);background:#0E2231}
+.pipe div:not(:last-child)::after{content:"→";position:absolute;right:-9px;top:50%;transform:translateY(-50%);color:var(--dim);font-size:13px}
+.mgrid{display:grid;grid-template-columns:1.2fr 1fr;gap:14px}
+.mbox{background:#12181E;border:1px solid #1E262E;border-radius:12px;padding:16px}
+.mbox h3{font-size:15px;margin-bottom:12px}
+.hb{display:grid;grid-template-columns:150px 1fr 70px;gap:10px;align-items:center;font-size:13px;margin:7px 0}
+.hb .track{height:10px;background:#1C242C;border-radius:5px;overflow:hidden}
+.hb .track i{display:block;height:100%;border-radius:5px;transition:width .3s}
+.hb em{font-style:normal;text-align:right;color:var(--muted);font-variant-numeric:tabular-nums}
+.feed{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12px;line-height:1.7;color:#B8C4CF}
+.feed div{display:flex;gap:10px;white-space:nowrap;overflow:hidden;border-bottom:1px solid #182028;padding:3px 0}
+.feed .id{color:var(--dim);width:64px;flex:none}
+.prog{height:6px;background:#1C242C;border-radius:3px;overflow:hidden;margin-top:14px}
+.prog i{display:block;height:100%;width:0;background:var(--blue)}
+
+@media (max-width:820px){
+  body{flex-direction:column;gap:14px;overflow:auto;padding:16px 0;justify-content:flex-start}
+  .panel{width:calc(100% - 32px);order:2;max-height:none}
+  .motor{width:calc(100% - 24px)}
+  .kpis{grid-template-columns:1fr 1fr}.pipe{grid-template-columns:1fr 1fr 1fr}.mgrid{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<aside class="panel">
+  <h1>KBC Weather Report</h1>
+  <div class="personas" id="personas"></div>
+  <div class="plabel" id="plabel"></div>
+  <div class="scenes" id="scenes"></div>
+  <div class="navrow"><button data-nav="-1">← previous</button><button data-nav="1">next →</button><button data-nav="r">reset</button></div>
+  <p class="hint">Arrow keys or space: next scene. R: reset everything. You can also just click inside the app.</p>
+  <p class="disclaimer">Working concept for the KBC challenge (Tectonic hackathon). Not an official KBC app. All people, amounts and customers are synthetic.</p>
+</aside>
+
+<div class="stage" id="stage"><div class="phone" id="phone"><section class="screen" id="screen"></section></div></div>
+
+<section class="motor" id="motor"></section>
+
+<script>
+/* ================= icons ================= */
+const S=(w,h,body)=>`<svg width="${w}" height="${h}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">${body}</svg>`;
+const I={
+ gear:S(26,26,'<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/>'),
+ search:S(20,20,'<circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/>'),
+ bell:S(26,26,'<path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.9 1.9 0 0 0 3.4 0"/>'),
+ kmark:`<svg width="10" height="10" viewBox="0 0 10 10"><rect x="1" y="2" width="8" height="1.4" rx=".7" fill="#1A9FE4"/><rect x="2.5" y="4.3" width="5" height="1.4" rx=".7" fill="#1A9FE4"/><rect x="1" y="6.6" width="8" height="1.4" rx=".7" fill="#1A9FE4"/></svg>`,
+ kmarkw:`<svg width="22" height="22" viewBox="0 0 10 10"><rect x="1" y="2" width="8" height="1.4" rx=".7" fill="#fff"/><rect x="2.5" y="4.3" width="5" height="1.4" rx=".7" fill="#fff"/><rect x="1" y="6.6" width="8" height="1.4" rx=".7" fill="#fff"/></svg>`,
+ wallet:S(20,20,'<path d="M4 7h14a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V7z"/><path d="M4 7l11-3v3"/><circle cx="16" cy="13.5" r=".8" fill="currentColor"/>'),
+ walletf:`<svg width="26" height="26" viewBox="0 0 24 24"><path d="M4 7h14a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V7z" fill="#fff"/><path d="M4 7l11-3v3" stroke="#fff" stroke-width="1.6" fill="none"/><circle cx="16" cy="13.5" r="1" fill="#141618"/></svg>`,
+ news:S(18,18,'<rect x="5" y="3" width="15" height="18" rx="1"/><path d="M5 7H3v12a2 2 0 0 0 2 2M9 7h7M9 11h7M9 15h5"/>'),
+ house:S(18,18,'<path d="M3 11 12 4l9 7"/><path d="M5 10v10h14V10"/>'),
+ sign:S(18,18,'<path d="M12 3v18M5 6h12l2 2-2 2H5zM19 13H7l-2 2 2 2h12z"/>'),
+ star:S(22,22,'<path d="m12 3 2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1-4.4-4.3 6.1-.9z"/>'),
+ plus:S(22,22,'<circle cx="12" cy="12" r="9"/><path d="M12 8v8M8 12h8"/>'),
+ hex:S(32,32,'<path d="M9 5l3-2 3 2v3l-3 2-3-2zM4 12l3-2 3 2v3l-3 2-3-2zM14 12l3-2 3 2v3l-3 2-3-2zM9 17l3-2 3 2v3l-3 2-3-2z"/>'),
+ swap:S(30,30,'<path d="M4 8h15M15 4l4 4-4 4M20 16H5M9 12l-4 4 4 4"/>'),
+ list:S(26,26,'<circle cx="4.5" cy="6" r="1.2"/><circle cx="4.5" cy="12" r="1.2"/><circle cx="4.5" cy="18" r="1.2"/><rect x="8" y="4.5" width="13" height="3" rx="1.5"/><rect x="8" y="10.5" width="13" height="3" rx="1.5"/><rect x="8" y="16.5" width="13" height="3" rx="1.5"/>'),
+ piggy:S(26,26,'<path d="M19 10c1 .4 2 1.4 2 2.5v1.5h-2c-.6 1.6-1.8 2.8-3 3.4V20h-3v-2h-3v2H7v-2.8A6.5 6.5 0 0 1 11.5 6c2.4 0 4.6 1.2 5.8 3z"/><path d="M13 4.5a2 2 0 0 1 3 1.5"/><circle cx="16" cy="11" r=".6" fill="currentColor"/>'),
+ layers:S(26,26,'<path d="m12 3 9 5-9 5-9-5z"/><path d="m3 12 9 5 9-5M3 16l9 5 9-5"/>'),
+ back:S(26,26,'<path d="M20 12H4M10 6l-6 6 6 6"/>'),
+ close:S(24,24,'<path d="M5 5l14 14M19 5 5 19"/>'),
+ info:S(24,24,'<circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/>'),
+ mic:S(22,22,'<rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/>'),
+ play:`<svg width="16" height="16" viewBox="0 0 24 24"><path d="M7 4v16l13-8z" fill="currentColor"/></svg>`,
+ phone:S(20,20,'<path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.7a2 2 0 0 1-.5 2.1L8 9.8a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.7.7a2 2 0 0 1 1.7 2z"/>'),
+ heart:S(30,30,'<path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 0 0-7.8 7.8L12 21.2l8.8-8.8a5.5 5.5 0 0 0 0-7.8z"/>'),
+ shield:`<svg width="22" height="22" viewBox="0 0 24 24"><path d="M12 3 4 6v6c0 5 3.4 8 8 9 4.6-1 8-4 8-9V6z" fill="#DC7507"/><path d="M12 8v5M12 16h.01" stroke="#231300" stroke-width="2" stroke-linecap="round"/></svg>`,
+ bot:S(22,22,'<rect x="4" y="8" width="16" height="12" rx="3"/><path d="M12 4v4M9 13h.01M15 13h.01M9 17h6"/>')
+};
+const ic=(n)=>I[n]||'';
+const K=`<span class="klogo">${I.kmark}</span>`;
+
+/* weather glyphs */
+const CL='M7 18a4.5 4.5 0 1 1 1-8.9A6 6 0 0 1 19.5 11 3.5 3.5 0 0 1 18 18z';
+function wx(t,s){
+  s=s||28;
+  const sun=(cx,cy,r)=>`<g stroke="#E9C100" stroke-width="1.8" stroke-linecap="round">${[0,45,90,135,180,225,270,315].map(a=>{const c=Math.cos(a*Math.PI/180),n=Math.sin(a*Math.PI/180);return `<line x1="${(cx+c*(r+2.5)).toFixed(1)}" y1="${(cy+n*(r+2.5)).toFixed(1)}" x2="${(cx+c*(r+5)).toFixed(1)}" y2="${(cy+n*(r+5)).toFixed(1)}"/>`}).join('')}</g><circle cx="${cx}" cy="${cy}" r="${r}" fill="#E9C100"/>`;
+  const B={
+   zon:sun(12,12,5),
+   bewolkt:sun(9,8.5,3.6)+`<path d="${CL}" fill="#C9D3DC" transform="translate(1.5 1.5) scale(.9)"/>`,
+   regen:`<path d="${CL}" transform="translate(0 -3)" fill="#AFC0CF"/><path d="M8 18l-1 3M12 18l-1 3M16 18l-1 3" stroke="#74C8ED" stroke-width="1.8" stroke-linecap="round"/>`,
+   donder:`<path d="${CL}" transform="translate(0 -3)" fill="#8997A5"/><path d="m13 12-3 5h3.5l-2 5" stroke="#F69D14" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>`,
+   storm:`<path d="${CL}" transform="translate(0 -3)" fill="#5F6B77"/><path d="m13 12-3 5h3.5l-2 5" stroke="#D64040" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M7 17l-1.5 3M18 17l-1.5 3" stroke="#74C8ED" stroke-width="1.8" stroke-linecap="round"/>`,
+   regenboog:`<path d="M3 17a9 9 0 0 1 18 0" stroke="#EE7079" stroke-width="1.8" fill="none"/><path d="M5.5 17a6.5 6.5 0 0 1 13 0" stroke="#E9C100" stroke-width="1.8" fill="none"/><path d="M8 17a4 4 0 0 1 8 0" stroke="#5BA215" stroke-width="1.8" fill="none"/><path d="M10.3 17a1.7 1.7 0 0 1 3.4 0" stroke="#74C8ED" stroke-width="1.8" fill="none"/>`,
+   mist:`<path d="M4 8h13M6 12h14M3 16h12M8 20h10" stroke="#AEB9C4" stroke-width="2" stroke-linecap="round"/>`,
+   seizoen:`<path d="M5 19C5 10 11 4 20 4c0 9-6 15-15 15z" fill="#F69D14"/><path d="M5 19 14 10" stroke="#5A3300" stroke-width="1.5" stroke-linecap="round"/>`,
+   klimaat:`<circle cx="12" cy="12" r="8" fill="#1A9FE4"/><path d="M6 9c3 1 3 3 6 3s2 4 5 4M9 5c1 2 4 2 5 0" stroke="#9FE3A0" stroke-width="1.8" fill="none" stroke-linecap="round"/>`
+  };
+  return `<svg width="${s}" height="${s}" viewBox="0 0 24 24">${B[t]||''}</svg>`;
+}
+const WXN={zon:'Sunny',bewolkt:'Cloudy',regen:'Rain',donder:'Thunder',storm:'Storm',regenboog:'Clearing up',mist:'Fog',seizoen:'New season',klimaat:'Climate'};
+const LEX=[
+ ['zon','Sun','Plenty of buffer, no big expenses.'],
+ ['bewolkt','Cloudy','Tight but safe. Kate stays quiet.'],
+ ['regen','Rain','A planned, large expense.'],
+ ['donder','Thunder','A spike in impulse spending. No blame.'],
+ ['storm','Storm','Several costs at once: an overdraft is coming.'],
+ ['mist','Fog','Uncertain income: Kate works with a range.'],
+ ['regenboog','Clearing up','After the rain comes the sunshine: you’re back on track.'],
+ ['seizoen','Season','A new life stage changes your whole forecast.'],
+ ['klimaat','Climate','Your long term: retirement, home, future you.']
+];
+const eur=v=>(v<0?'−':'')+'€'+Math.abs(Math.round(v)).toLocaleString('en-GB');
+
+/* ================= state ================= */
+const init=()=>({
+  lotte:{uitgaan:false,gsm:false,sparen:true,sel:0},
+  klimaat:{m:50,r:.04},
+  agent:{lezen:true,scen:true,pay:false,step:0,log:[]},
+  peeters:{moment:null,buffer:false,emma:false,shared:true,done:{}},
+  yas:{vos:false,half:false},
+  jos:{called:false}
+});
+let ST=init();
+let sheet=null, toast=null, cur=0;
+
+/* ================= Lotte model ================= */
+const START=Date.UTC(2026,9,2), NDAYS=29, DN=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+const lbl=(i,base,unit)=>{const d=new Date((base||START)+i*864e5*(unit||1));return {dn:DN[d.getUTCDay()],dd:d.getUTCDate()+'/'+(d.getUTCMonth()+1)}};
+const FIX={3:[['Phone plan',25]],4:[['Gift for Sara (birthday)',35]],5:[['Energy bill',85]],6:[['Spotify',12]],13:[['Tenant insurance',48]],18:[['Gym',30]]};
+function lotte(st){
+  const ev=[...Array(NDAYS)].map((_,i)=>(FIX[i]||[]).map(([n,a])=>({n,a,k:'vast'})));
+  if(st.uitgaan) ev[0].push({n:'Night out',a:60,k:'impuls'});
+  if(st.gsm) ev[8].push({n:'New phone',a:299,k:'groot'});
+  if(st.sparen) [7,14,21].forEach(i=>ev[i].push({n:'To Lisbon',a:25,k:'sparen'}));
+  const planned=ev.flat().reduce((s,e)=>s+e.a,0), vrij=(1120-planned-100)/NDAYS;
+  let b=1120; const path=[b]; for(let i=0;i<NDAYS;i++){b-=20+ev[i].reduce((s,e)=>s+e.a,0);path.push(b)}
+  const low=Math.min(...path), w=[];
+  for(let i=0;i<NDAYS;i++){const e=ev[i],sp=e.filter(x=>x.k!=='sparen').reduce((s,x)=>s+x.a,0);let t;
+    if(e.some(x=>x.k==='groot'))t=low<0?'storm':'regen';else if(e.some(x=>x.k==='impuls'))t='donder';else if(sp>=30)t='regen';
+    else if(i>0&&w[i-1]==='donder')t='bewolkt';else if(i>1&&w[i-2]==='donder')t='regenboog';else if(vrij<18)t='bewolkt';else t='zon';w.push(t)}
+  return {ev,vrij,path,low,w,red:path.findIndex((v,i)=>i>0&&v<0)};
+}
+const spend=e=>e.filter(x=>x.k!=='sparen').reduce((s,x)=>s+x.a,0);
+function lHead(m,st){ if(m.red>0)return `Storm on Saturday 10/10. With that phone you’re overdrawn from ${lbl(m.red-1).dd}.`; if(st.uitgaan)return 'Thunder tonight, but after the rain comes the sunshine: Sunday is sunny again.'; return 'A sunny month, with some rain on 6 and 7 October.'}
+function goalTxt(st){return st.sparen?'At €25 a week you’ll get there around December.':'Without a savings booster you won’t make it by summer.'}
+
+/* ================= chrome helpers ================= */
+const status=t=>`<div class="status"><span>${t}</span><span style="font-size:14px">5G</span></div>`;
+const topbar=(ph)=>`<div class="top"><span class="iconbtn">${I.gear}</span><div class="search" data-go="l-chat">${I.search}${ph||'How can I help?'}<span class="kate">${K}Kate</span></div><span class="iconbtn bell dot">${I.bell}</span></div>`;
+const chips=`<div class="chips"><span class="chip sel">${I.wallet}</span><span class="chip">${I.news}MyNWS</span><span class="chip">${I.house}MyHome</span><span class="chip">${I.sign}MyMobility</span></div>`;
+const tabbar=`<span class="fab">${I.swap}</span><nav class="tabbar"><span class="tab on">${I.walletf}Home</span><span class="tab">${I.list}My KBC</span><span class="tab">${I.piggy}Invest</span><span class="tab">${I.layers}Offers</span></nav><span class="home"></span>`;
+const sub=(t,title,back,right)=>`${status(t)}<div class="subhead"><button class="iconbtn" data-go="${back}">${I.back}</button><h3>${title}</h3>${right||'<span class="iconbtn"></span>'}</div>`;
+const acct=(name,label,bal,bg,sel)=>`<div class="acct ${sel?'sel':''}"><div class="img" style="background:${bg}"><svg width="128" height="92"><circle cx="100" cy="20" r="30" fill="#fff" opacity=".12"/><circle cx="20" cy="84" r="40" fill="#fff" opacity=".08"/></svg><span>${name}</span></div><div class="nm">${label}</div><div class="bal">${bal}</div></div>`;
+const toggle=(key,emoji,title,small,on)=>`<div class="toggle" data-tog="${key}"><span class="emoji">${emoji}</span><div class="tx2">${title}<small>${small}</small></div><span class="sw ${on?'on':''}"></span></div>`;
+const whyLink=(k)=>`<button class="link" data-sheet="${k}">Why am I seeing this?</button>`;
+function lineChart(path,opt){
+  opt=opt||{};const W=330,H=150,p=12,mx=opt.max??Math.max(...path,...(opt.hi||[]))*1.08,mn=opt.min??Math.min(0,...path,...(opt.lo||[]))-60;
+  const n=path.length-1,X=i=>p+i*(W-2*p)/n,Y=v=>p+(mx-v)*(H-2*p)/(mx-mn);
+  const pts=a=>a.map((v,i)=>`${X(i).toFixed(1)},${Y(v).toFixed(1)}`);
+  const neg=(opt.lo?Math.min(...opt.lo):Math.min(...path))<0, col=opt.col||(neg&&!opt.lo?'#D64040':'#1A9FE4');
+  let s=`<defs><linearGradient id="g${opt.id||''}" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="${col}" stop-opacity=".35"/><stop offset="1" stop-color="${col}" stop-opacity="0"/></linearGradient></defs>`;
+  s+=`<line x1="${p}" x2="${W-p}" y1="${Y(0)}" y2="${Y(0)}" stroke="#4A5057" stroke-dasharray="3 4"/><text x="${p}" y="${Y(0)+13}" font-size="10" fill="#A3AAB1">€0</text>`;
+  if(opt.lo){ s+=`<path d="M${pts(opt.hi).join('L')}L${pts(opt.lo).reverse().join('L')}Z" fill="#AEB9C4" opacity=".18"/>`;
+    s+=`<polyline points="${pts(opt.lo).join(' ')}" fill="none" stroke="${Math.min(...opt.lo)<0?'#F69D14':'#8A96A3'}" stroke-width="1.6" stroke-dasharray="4 3"/><polyline points="${pts(opt.hi).join(' ')}" fill="none" stroke="#8A96A3" stroke-width="1.6" stroke-dasharray="4 3"/>`;}
+  else s+=`<path d="M${pts(path).join('L')}L${X(n)},${Y(mn)}L${X(0)},${Y(mn)}Z" fill="url(#g${opt.id||''})"/>`;
+  s+=`<polyline points="${pts(path).join(' ')}" fill="none" stroke="${col}" stroke-width="2.4" stroke-linejoin="round"/>`;
+  s+=`<circle cx="${X(n)}" cy="${Y(path[n])}" r="4" fill="${col}"/><text x="${X(n)-6}" y="${Y(path[n])-9}" text-anchor="end" font-size="11" font-weight="700" fill="#F2F4F5">${eur(path[n])}</text>`;
+  if(opt.lo){s+=`<text x="${X(n)-6}" y="${Y(opt.lo[n])+14}" text-anchor="end" font-size="10.5" fill="${Math.min(...opt.lo)<0?'#FFA663':'#A3AAB1'}">worst case ${eur(opt.lo[n])}</text>`}
+  return `<svg viewBox="0 0 ${W} ${H}">${s}</svg>`;
+}
+
+/* ================= scenes ================= */
+const P={
+ lotte:{name:'Lotte',desc:'<b>Lotte, 23.</b> First job, loves going out, saving for Lisbon.'},
+ peeters:{name:'Peeters',desc:'<b>The Peeters family.</b> Sofie (48) and Tom. Daughter Emma is moving into student housing in Ghent.'},
+ yas:{name:'Yasmina',desc:'<b>Yasmina, 34.</b> Freelance photographer with an irregular income.'},
+ jos:{name:'Jos',desc:'<b>Jos, 74.</b> Lost his wife in September. Lives alone.'},
+ motor:{name:'Engine',desc:'<b>The engine.</b> How this works for 2.3 million customers.'}
+};
+const SC=[
+ {id:'l-start',p:'lotte',t:'Home',s:'forecast in "For you"'},
+ {id:'l-detail',p:'lotte',t:'You choose the weather',s:'14 days + scenarios'},
+ {id:'l-lock',p:'lotte',t:'Saturday morning',s:'push notification'},
+ {id:'l-chat',p:'lotte',t:'After the rain, sunshine',s:'Kate chat'},
+ {id:'l-klimaat',p:'lotte',t:'Climate: future you',s:'long term + voice'},
+ {id:'l-agent',p:'lotte',t:'2030: your assistant',s:'KBC Weather API'},
+ {id:'p-start',p:'peeters',t:'Change of season',s:'Kate spots a life moment'},
+ {id:'p-seizoen',p:'peeters',t:'Child leaves home',s:'autumn forecast for the family'},
+ {id:'p-kate',p:'peeters',t:'Kate chooses you',s:'even against KBC'},
+ {id:'y-mist',p:'yas',t:'Fog',s:'uncertain income'},
+ {id:'y-oranje',p:'yas',t:'Code orange',s:'a human calls back'},
+ {id:'j-zorg',p:'jos',t:'Shelter',s:'care mode'},
+ {id:'j-rood',p:'jos',t:'Code red',s:'fraud + Guardian Angel'},
+ {id:'m-motor',p:'motor',t:'The engine',s:'live simulation'}
+];
+
+const R={};
+/* ----- Lotte ----- */
+R['l-start']=()=>{const st=ST.lotte,m=lotte(st);
+ return `${status('18:05')}${topbar()}<div class="scroll">${chips}
+ <div class="accts">${acct('Lotte','Current account','€1,120.00','linear-gradient(135deg,#46ADE0,#0B5E93)',1)}${acct('✈','Lisbon','€340.00','linear-gradient(160deg,#F69D14,#EE7079 55%,#7C45B6)')}<div class="acct small">${I.star}Edit favourites<span style="color:var(--green)">${I.plus}</span>New</div></div>
+ <div class="tx"><div><span class="d">02/10</span>Delhaize Ghent<span class="a">- 23.40</span></div><div><span class="d">01/10</span>October rent<span class="a">- 650.00</span></div><div><span class="d">30/09</span>Studio Noord (salary)<span class="a p">+ 2,180.00</span></div><p style="margin-top:6px"><span class="link">⌃&nbsp;&nbsp;Hide payments</span></p></div>
+ <div class="sec"><div class="sechead"><h2>For you</h2><span class="link">All messages</span></div>
+  <div class="card wx" data-go="l-detail"><span class="dot"></span>
+   <div class="wxtop">${K}Your financial weather report<span class="tag">New</span></div>
+   <div class="wxnow">${wx(m.w[0],56)}<div><div class="temp">${eur(m.vrij)}</div><div class="sub">free per day<br>until payday on 30/10</div></div><div class="lbl">${WXN[m.w[0]]}<small>today</small></div></div>
+   <div class="wxhead">${lHead(m,st)}</div>
+   <div class="week">${[...Array(7)].map((_,i)=>{const t=spend(m.ev[i]);return `<div><div class="dn ${i?'':'today'}">${i?lbl(i).dn:'now'}</div>${wx(m.w[i],26)}<div class="amt">${t?'-'+t:''}</div></div>`}).join('')}</div>
+   <div class="pills"><span class="pill sm fill">Choose your weather</span><span class="pill sm" data-go="l-klimaat">My climate</span></div>
+  </div>
+  <div class="card"><span class="x">✕</span><div class="tip"><span class="ic">${I.hex}</span><div><div class="tiph">${K}Kate tip</div><div class="t">Your top 10 extra services always within reach? Set your favourites now.</div></div></div></div>
+ </div>
+ <div class="sec"><div class="sechead"><h2>Your money at a glance</h2><span class="link">Show all</span></div>
+  <div class="card inuit"><div style="display:flex;justify-content:space-between"><span style="font-size:16px">In &amp; out <span style="color:var(--muted);font-size:14px">&nbsp;October</span></span><span style="color:var(--muted)">•••</span></div>
+  <div class="row"><div class="kpi"><span class="sq" style="background:var(--teal)"></span><div><small>Income</small><b>€0.00</b></div></div><div class="kpi"><span class="sq" style="background:var(--yellow)"></span><div><small>Spending</small><b>€673.40</b></div></div></div>
+  <div class="bars">${[[40,55],[62,48],[60,90],[58,50],[64,52],[0,26]].map(([a,b],i)=>`<div class="m"><i style="height:${a}px;background:${i===5?'#0E9E83':'#1E4A42'}"></i><i style="height:${b}px;background:${i===5?'#E9C100':'#5A4D12'}"></i></div>`).join('')}</div>
+  <div class="months"><span>May</span><span>Jun</span><span>Jul</span><span>Aug</span><span>Sep</span><b style="color:var(--text)">Oct</b></div></div></div>
+ <div class="sec"><div class="sechead"><h2>Save for your dreams</h2><span class="link">See more</span></div>
+  <div class="card goal"><div style="display:flex;justify-content:space-between;font-size:15px"><b>✈️&nbsp; Lisbon</b><span style="color:var(--muted)">€340 of €600</span></div><div class="bar"><i style="width:57%"></i></div><div style="font-size:13.5px;color:var(--muted)">${goalTxt(st)}</div></div></div>
+ </div>${tabbar}`};
+
+R['l-detail']=()=>{const st=ST.lotte,m=lotte(st),b0=lotte({...st,uitgaan:false,gsm:false});const dl=Math.round(m.vrij)-Math.round(b0.vrij);
+ const e=m.ev[st.sel],t=m.w[st.sel],L=lbl(st.sel);
+ const txt={zon:'No big expenses planned. Enjoy.',bewolkt:(st.sel>0&&m.w[st.sel-1]==='donder')?'A quiet day after yesterday. Your week is already rearranged.':'Tight but safe. Kate sends nothing today.',regen:'A planned expense. Your buffer absorbs it.',donder:'A night out. No blame: Kate rearranges the days after.',storm:'This purchase pushes your account into overdraft before the month ends.',regenboog:'After the rain comes the sunshine: you’re back on track.'}[t];
+ return `${sub('18:06','Your weather report','l-start',`<button class="iconbtn" data-sheet="lex">${I.info}</button>`)}<div class="scroll" style="padding-bottom:40px">
+ <div class="hero"><div class="big">${wx(m.red>0?'storm':m.w[0],64)}<h2>${lHead(m,st)}</h2></div>
+ <div class="temp2"><b>${eur(m.vrij)}</b><span>free per day until payday on 30/10</span>${dl?`<span class="delta" style="background:${dl<0?'#3A2A12':'#1E3A14'};color:${dl<0?'#FFA663':'#8CD656'}">${dl<0?'−':'+'}€${Math.abs(dl)}</span>`:''}</div></div>
+ ${m.red>0?`<div class="warnbox"><b>Kate:</b> If you wait until after payday on 30/10, it stays dry all month. Or shall we spread the purchase over 3 months, at no cost?<div class="pills"><span class="pill sm" data-act="gsmLater">Wait until after payday</span><span class="pill sm">Show options</span></div></div>`:''}
+ <div class="strip">${[...Array(14)].map((_,i)=>{const l=lbl(i),tt=spend(m.ev[i]);return `<div class="day ${st.sel===i?'sel':''}" data-act="sel" data-v="${i}"><div class="dn">${i?l.dn:'today'}</div><div class="dd">${l.dd}</div>${wx(m.w[i],30)}<div class="ev">${tt?'-€'+tt:''}</div></div>`}).join('')}</div>
+ <div class="dayinfo"><b>${st.sel===0?'Today':L.dn} ${L.dd} · ${WXN[t]}</b>${txt}${e.length?'<ul>'+e.map(x=>`<li>${x.n}: ${eur(x.a)}</li>`).join('')+'</ul>':''}</div>
+ <div class="sec"><div class="sechead"><h2>Choose your weather</h2><span style="font-size:13px;color:var(--muted)">calculated live</span></div>
+  <div class="card" style="padding:4px 16px">${toggle('lotte.uitgaan','🎉','Night out tonight','Fri 2/10 · about €60',st.uitgaan)}${toggle('lotte.gsm','📱','Buy a new phone','Sat 10/10 · €299',st.gsm)}${toggle('lotte.sparen','✈️','Every Friday €25 to Lisbon','from Fri 9/10',st.sparen)}</div></div>
+ <div class="sec"><div class="sechead"><h2>Your account until payday</h2></div><div class="card chart" style="padding:14px 12px 10px">${lineChart(m.path,{max:1250,min:-300})}<div class="legend"><span>today</span><span>payday 30/10</span></div></div></div>
+ <div class="sec"><div class="card goal"><div style="display:flex;justify-content:space-between;font-size:15px"><b>✈️&nbsp; Lisbon</b><span style="color:var(--muted)">€340 of €600</span></div><div class="bar"><i style="width:57%"></i></div><div style="font-size:13.5px;color:var(--muted)">${goalTxt(st)}</div></div></div>
+ <div class="sec" style="display:flex;gap:18px">${whyLink('lotte')}<button class="link" data-sheet="lex">What does the weather mean?</button></div>
+ <p class="fine">Kate uses your fixed payments, your usual spending over the past months and the choices above. The weather is a forecast, not a judgement.</p></div>`};
+
+R['l-lock']=()=>`<div class="screen lock" style="position:absolute;inset:0;display:flex;flex-direction:column"><div class="status"><span></span><span style="font-size:14px">5G</span></div><div class="clock"><div class="dte">Saturday 3 October</div><div class="tm">9:12</div></div>
+ <div class="notif" data-go="l-chat"><span class="appic">${I.kmarkw}</span><div><div class="h">KBC Mobile · Kate<span>now</span></div><div class="b">After the rain comes the sunshine ☀️ Yesterday brought thunder. I’ve rearranged your week, it’s sunny again from tomorrow.</div></div></div>
+ <div class="lockhint">Tap the notification</div><span class="home"></span></div>`;
+
+R['l-chat']=()=>`${sub('9:12','Kate','l-start',`<button class="iconbtn" data-go="l-start">${I.close}</button>`)}<div class="chatwrap" id="chat"></div><div class="input">Type your question here<span class="mic">${I.mic}</span></div><span class="home"></span>`;
+function playChat(){
+  ST.lotte.uitgaan=true;
+  const b=lotte({...ST.lotte,uitgaan:false,gsm:false}),a=lotte({...ST.lotte,gsm:false});
+  const wk=[1,2,3,4,5].map(i=>{const tt=spend(a.ev[i]);return `<div><small>${i===1?'today':lbl(i).dn}</small>${wx(a.w[i],28)}<em>${tt?'-€'+tt:WXN[a.w[i]].toLowerCase()}</em></div>`}).join('');
+  chatSeq([
+   `<div class="chatday">Today</div><div class="chatai">Ask Kate, your AI assistant ✦</div>`,
+   `<div class="kav">${I.kmark}</div><div class="msg">Good morning Lotte ☀️</div>`,
+   `<div class="msg">Yesterday brought thunder, but after the rain comes the sunshine. I’ve already rearranged your week, you don’t need to do a thing.</div>`,
+   `<div class="mini"><div style="display:flex;justify-content:space-between;font-size:14.5px"><b>Your week</b><span style="color:var(--muted)">${eur(b.vrij)} → <b style="color:var(--text)">${eur(a.vrij)}</b> per day</span></div><div class="mw">${wk}</div></div>`,
+   `<div class="msg">Your Lisbon dream stays on track. A bit quieter today, sunny again from tomorrow.</div><div class="pills"><span class="pill sm" data-go="l-detail">Show my weather report</span><span class="pill sm" data-sheet="lotte">Why am I seeing this?</span><span class="pill sm" data-act="toast" data-v="Got it. No more morning messages after a night out.">No messages after nights out</span></div>`
+  ]);
+}
+let timers=[];
+function chatSeq(parts){
+  timers.forEach(clearTimeout);timers=[];const el=document.getElementById('chat');if(!el)return;el.innerHTML='';let t=150;
+  parts.forEach((p,i)=>{
+    if(i>=2){timers.push(setTimeout(()=>el.insertAdjacentHTML('beforeend','<div class="msg typing" id="typ"><span></span><span></span><span></span></div>'),t));t+=700}
+    timers.push(setTimeout(()=>{const ty=document.getElementById('typ');if(ty)ty.remove();const d=document.createElement('div');d.className='appear';d.innerHTML=p;el.appendChild(d);el.scrollTop=el.scrollHeight},t));t+=i<2?250:500;
+  });
+}
+
+function klimDyn(){const k=ST.klimaat,yrs=42,n=yrs*12,r=k.r/12;
+ const fv=mo=>r?k.m*((Math.pow(1+r,mo)-1)/r):k.m*mo; const path=[...Array(yrs+1)].map((_,y)=>fv(y*12)); const tot=fv(n), inleg=k.m*n;
+ const seasons=[[23,'First job'],[28,'Moving in together'],[31,'First home'],[34,'Children'],[50,'Kids leave home'],[65,'Retirement']];
+ const W=330,H=170,p=14,mx=Math.max(tot,1000)*1.12,X=a=>p+(a-23)*(W-2*p)/42,Y=v=>H-26-(v/mx)*(H-40);
+ const pts=path.map((v,i)=>`${X(23+i).toFixed(1)},${Y(v).toFixed(1)}`).join(' ');
+ const svg=`<svg viewBox="0 0 ${W} ${H}"><defs><linearGradient id="kg" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#5BA215" stop-opacity=".4"/><stop offset="1" stop-color="#5BA215" stop-opacity="0"/></linearGradient></defs><path d="M${X(23)},${Y(0)}L${pts.replace(/ /g,'L')}L${X(65)},${Y(0)}Z" fill="url(#kg)"/><polyline points="${pts}" fill="none" stroke="#8CD656" stroke-width="2.4"/><line x1="${p}" x2="${W-p}" y1="${Y(0)}" y2="${Y(0)}" stroke="#3A3F44"/>${seasons.map(([a,n2],i)=>`<g><line x1="${X(a)}" x2="${X(a)}" y1="${Y(0)}" y2="${Y(0)+5}" stroke="#6F777F"/><text x="${X(a)}" y="${H-6-(i%2)*0}" font-size="9.5" fill="#A3AAB1" text-anchor="${i===0?'start':i===seasons.length-1?'end':'middle'}">${a}</text></g>`).join('')}<circle cx="${X(65)}" cy="${Y(tot)}" r="4.5" fill="#8CD656"/><text x="${X(65)-8}" y="${Y(tot)-8}" text-anchor="end" font-size="12" font-weight="800" fill="#F2F4F5">${eur(tot)}</text></svg>`;
+ return `<div class="sec"><div class="card chart" style="padding:14px 12px 10px">${svg}<div class="legend"><span>23 · now</span><span>65 · retirement</span></div></div>
+  <div style="display:flex;gap:10px;margin-top:10px">${[['You put in',eur(inleg)],['Growth',eur(tot-inleg)],['At 65',eur(tot)]].map(([a,b])=>`<div class="card" style="flex:1;padding:12px"><div class="sub">${a}</div><b style="font-size:17px">${b}</b></div>`).join('')}</div></div>
+ <div class="sec"><div class="sechead"><h2>Your seasons</h2></div><div class="card" style="padding:6px 16px">${seasons.map(([a,n2],i)=>`<div class="check"><span class="ck" style="background:${i===0?'var(--blue)':'#2A2D30'};color:${i===0?'#06131C':'var(--muted)'}">${i===0?'●':''}</span><div><b>${n2}</b><small>${i===0?'now, your first season':'around age '+a}${i===2?' · Kate shows what your home will cost':''}${i===4?' · the "child leaves home" playbook is ready':''}</small></div></div>`).join('')}</div></div>
+ <div class="sec"><div class="card" style="background:linear-gradient(150deg,#1D3524,#1E2022 60%);border:1px solid #2E5A36">
+  <div class="tiph">${wx('klimaat',20)} Future you</div>
+  <div class="msg" style="font-size:15px;margin:8px 0 12px">"Hey Lotte, it’s you, 42 years from now. Remember how in 2026 you started putting ${eur(k.m)} a month aside? That’s now about ${eur(tot)}. Thank you, kid."</div>
+  <span class="pill fill sm" data-act="voiceFuture">${I.play} Listen to Lotte, 65</span></div></div>`};
+R['l-klimaat']=()=>{const k=ST.klimaat;
+ return `${sub('18:10','Your climate','l-start')}<div class="scroll" style="padding-bottom:40px">
+ <div class="hero"><div class="big">${wx('klimaat',60)}<h2>The weather is your week. The climate is your life.</h2></div>
+ <p>What you choose today shapes your climate later. Kate works it out for you, season by season.</p></div>
+ <div class="sec" style="padding-top:16px"><div class="card">
+  <div style="display:flex;justify-content:space-between;align-items:baseline"><span style="font-size:15px">Set aside each month</span><b style="font-size:24px" id="kamt">${eur(k.m)}</b></div>
+  <input type="range" min="0" max="300" step="10" value="${k.m}" data-range="klimaat.m" style="margin:10px 0 14px">
+  <div class="seg"><button class="${k.r===.02?'on':''}" data-act="rate" data-v=".02">Cautious · 2%</button><button class="${k.r===.04?'on':''}" data-act="rate" data-v=".04">Average · 4%</button><button class="${k.r===0?'on':''}" data-act="rate" data-v="0">Piggy bank · 0%</button></div>
+ </div></div>
+ <div id="kdyn">${klimDyn()}</div>
+ <p class="fine">Illustration, not investment advice. The return is an assumption; investing involves risk.</p></div>`};
+
+R['l-agent']=()=>{const a=ST.agent;
+ return `${sub('18:12','Assistants','l-start')}<div class="scroll" style="padding-bottom:40px">
+ <div class="hero"><div class="big">${wx('klimaat',52)}<h2>Today you read the weather report. Tomorrow your assistant reads it too.</h2></div>
+ <p>Lotte uses a personal AI assistant. It can read her forecast through the KBC Weather API, within limits she sets herself.</p></div>
+ <div class="sec" style="padding-top:16px"><div class="sechead"><h2>What may your assistant do?</h2></div>
+  <div class="card" style="padding:4px 16px">${toggle('agent.lezen','🌤️','Read your weather report','14 days, no individual payments',a.lezen)}${toggle('agent.scen','🧮','Run scenarios','"what if I buy this?"',a.scen)}${toggle('agent.pay','💳','Prepare payments','up to €50, always with your confirmation',a.pay)}</div></div>
+ <div class="sec"><div class="sechead"><h2>Live traffic</h2><button class="link" data-act="agentStep">Next question →</button></div>
+  <div class="code" id="agentlog">${a.log.length?a.log.join('\n\n'):'<span style="color:#6F777F">Tap "Next question" to let your assistant ask something.</span>'}</div></div>
+ <p class="fine">Every request uses a token with only the rights Lotte granted. She revokes them with one tap.</p></div>`};
+const AGQ=[
+ {q:'"Plan my weekend. What can I spend?"',req:'GET /v1/weather?days=14',need:'lezen',ok:()=>{const m=lotte(ST.lotte);return `{ <span class="k">"today"</span>: "${m.w[0]}", <span class="k">"free_per_day"</span>: ${Math.round(m.vrij)}, <span class="k">"weekend"</span>: ["${m.w[1]}","${m.w[2]}"] }`},say:'Your assistant: "Take it easy on Saturday, Sunday is sunny. I suggest a picnic instead of brunch."'},
+ {q:'"Can I buy €85 concert tickets for 10/10?"',req:'POST /v1/scenario { "amount": 85, "date": "2026-10-10" }',need:'scen',ok:()=>`{ <span class="k">"weather_that_day"</span>: "rain", <span class="k">"advice"</span>: "ok, after 30/10 it stays sunny", <span class="k">"lisbon_on_track"</span>: true }`,say:'Your assistant: "You can, but that week turns rainy. After payday everything stays sunny."'},
+ {q:'"Go ahead and pay for the tickets."',req:'POST /v1/payment { "amount": 85, "to": "BE12 ..." }',need:'pay',ok:()=>`{ <span class="k">"status"</span>: "awaiting_confirmation", <span class="k">"by"</span>: "Lotte, in KBC Mobile" }`,say:'Your assistant: "I’ve prepared the payment. Confirm it in KBC Mobile."'}
+];
+
+/* ----- Peeters ----- */
+R['p-start']=()=>{const pe=ST.peeters;
+ const moment= pe.moment===null?`<div class="card wx"><span class="dot"></span><div class="wxtop">${wx('seizoen',18)} Kate · a new season?<span class="tag" style="background:#8A5510">Question</span></div>
+   <div class="t" style="font-size:15px;line-height:1.55;margin-top:10px">On 18/08 you paid <b>€450 to Kotverhuur Gent</b>, a student landlord, and an invoice from the university came in. Is Emma moving into student housing?</div>
+   <div class="pills"><span class="pill sm fill" data-act="moment" data-v="ja">That’s right!</span><span class="pill sm" data-act="moment" data-v="nee">No</span><span class="pill sm ghost" data-act="moment" data-v="stil">I’d rather not talk about this</span></div>
+   <div style="margin-top:10px">${whyLink('peeters')}</div></div>`
+  : pe.moment==='ja'?`<div class="card wx" data-go="p-seizoen"><div class="wxtop">${wx('seizoen',18)} Season "child leaves home" is ready<span class="tag">New</span></div>
+   <div class="wxnow">${wx('storm',52)}<div><div class="temp" style="font-size:30px">September</div><div class="sub">stormy, then<br>clearing up</div></div></div>
+   <div class="wxhead">Around the move on 26/09, the deposit, rent, books and Lars’s school bill all land at once.</div>
+   <div class="pills"><span class="pill sm fill">See your autumn forecast</span></div></div>`
+  : `<div class="card"><div class="tiph">${K}Kate</div><div class="t" style="font-size:15px;line-height:1.5">${pe.moment==='stil'?'Understood. I won’t ask about this again and won’t use these payments for suggestions.':'Thanks, then I got it wrong. I’ll adjust my estimate.'}</div><div class="pills"><span class="pill sm" data-act="moment" data-v="reset">Undo</span></div></div>`;
+ return `${status('08:10')}${topbar()}<div class="scroll">${chips}
+ <div class="accts">${acct('Family','Family account','€3,240.00','linear-gradient(135deg,#46ADE0,#0B5E93)',1)}${acct('Emma','Youth account','€180.00','linear-gradient(135deg,#F6B1BD,#EE7079)')}<div class="acct small">${I.star}Edit favourites<span style="color:var(--green)">${I.plus}</span>New</div></div>
+ <div class="tx"><div class="hl"><span class="d">18/08</span>Kotverhuur Gent BV<span class="a">- 450.00</span></div><div><span class="d">17/08</span>Colruyt Aalst<span class="a">- 96.20</span></div><div class="hl"><span class="d">14/08</span>University (invoice)<span class="a">open</span></div></div>
+ <div class="sec"><div class="sechead"><h2>For you</h2><span class="link">All messages</span></div>${moment}
+  <div class="card"><span class="x">✕</span><div class="tip"><span class="ic">${I.hex}</span><div><div class="tiph">${K}Kate tip</div><div class="t">High energy prices? These tips keep the warmth in and the winter out.</div></div></div></div></div>
+ <div class="sec"><div class="sechead"><h2>Your money at a glance</h2><span class="link">Show all</span></div><div class="card"><div style="font-size:15px">In &amp; out <span style="color:var(--muted)">August</span></div><div class="sub" style="margin-top:8px">Income €5,820 · Spending €4,105</div></div></div>
+ </div>${tabbar}`};
+
+function peetersWeeks(){const pe=ST.peeters;const B=Date.UTC(2026,8,7);
+ const W=[...Array(12)].map((_,i)=>({i,l:lbl(i,B,7),ev:[],t:'zon'}));
+ W[0].ev.push(['School bill Lars',180]);W[0].t='regen';
+ W[2].ev.push(['Rental deposit',900],['First month’s rent',450],['Books and course notes',250],['Mattress and move',150]);W[2].t=pe.buffer?'regen':'storm';
+ W[3].ev.push(['Salaries arrive (1/10)',0]);W[3].t='regenboog';
+ [7,11].forEach(i=>{W[i].ev.push(['Student rent',pe.emma?350:450]);W[i].t=pe.emma?'bewolkt':'regen'});
+ W[3].ev.push(['Student rent',pe.emma?350:450]);
+ W[5].ev.push(['Autumn break',120]);W[5].t='bewolkt';
+ return W;}
+R['p-seizoen']=()=>{const pe=ST.peeters,W=peetersWeeks(),low=pe.buffer?120:-420;
+ return `${sub('08:12','Season: child leaves home','p-start',`<button class="iconbtn" data-sheet="lex">${I.info}</button>`)}<div class="scroll" style="padding-bottom:40px">
+ <div class="hero"><div class="big">${wx(pe.buffer?'regen':'storm',60)}<h2>${pe.buffer?'September turns rainy, but you stay dry.':'Storm around 26/09. Then it clears up.'}</h2></div>
+ <p>${pe.buffer?'Kate bridges €540 interest-free until your salaries arrive on 1/10.':'The move puts the family account in overdraft for 5 days, down to '+eur(low)+', until your salaries arrive on 1/10.'}</p></div>
+ <div class="strip">${W.map(w=>`<div class="day" style="width:66px"><div class="dn">week</div><div class="dd">${w.l.dd}</div>${wx(w.t,30)}<div class="ev">${w.ev.filter(e=>e[1]).reduce((s,e)=>s+e[1],0)?'-€'+w.ev.reduce((s,e)=>s+e[1],0):''}</div></div>`).join('')}</div>
+ <div class="dayinfo"><b>Week of 21/09 · ${pe.buffer?'Rain':'Storm'}</b><ul>${W[2].ev.map(e=>`<li>${e[0]}: ${eur(e[1])}</li>`).join('')}</ul></div>
+ <div class="sec"><div class="sechead"><h2>Choose your weather</h2><span style="font-size:13px;color:var(--muted)">calculated live</span></div>
+  <div class="card" style="padding:4px 16px">${toggle('peeters.buffer','🛟','Interest-free buffer until 1/10','Kate bridges up to 5 days, at no cost',pe.buffer)}${toggle('peeters.emma','🎓','Emma chips in €100','from her student job, starting October',pe.emma)}</div></div>
+ <div class="sec"><div class="sechead"><h2>One family, two accounts</h2></div>
+  <div class="card"><div style="display:flex;gap:12px;align-items:center"><span class="avatar" style="background:linear-gradient(145deg,#F6B1BD,#EE7079);color:#3B1117">E</span><div style="font-size:14.5px;line-height:1.45"><b>Shared student budget with Emma</b><br><span style="color:var(--muted)">Emma sees her own weather: €280 a month for food and going out. You only see whether it stays sunny, not what she buys.</span></div></div>
+  ${toggle('peeters.shared','🤝','Share the student forecast with Emma','Emma has to approve this too',pe.shared)}</div></div>
+ <div class="sec"><div class="sechead"><h2>What Kate prepares</h2></div><div class="card" style="padding:6px 16px">
+  <div class="check"><span class="ck" style="background:#1E3A14;color:#8CD656">✓</span><div><b>Student account for Emma</b><small>free until 25, with her own card</small></div></div>
+  <div class="check"><span class="ck" style="background:#1E3A14;color:#8CD656">✓</span><div><b>Rental deposit in a blocked deposit account</b><small>the €900 stays yours and earns interest</small></div></div>
+  <div class="check" data-go="p-kate"><span class="ck" style="background:#3A2A12;color:#FFA663">!</span><div><b>Student room insurance: not needed</b><small>your family policy already covers the room. <span class="link">Kate chooses you →</span></small></div></div>
+ </div></div>
+ <p class="fine">Signals: a new recurring payment to a student landlord, a university invoice and Emma’s age. Confirmed by Sofie on 24/08.</p></div>`};
+
+const SAVES=[
+ {k:'kot',t:'No separate student room insurance',d:'Emma’s room is already covered by your family policy. I advise against adding one.',a:96},
+ {k:'omnium',t:'Full comprehensive cover on a 9-year-old car',d:'The car is worth about €4,000 now. Partial cover is cheaper.',a:216},
+ {k:'reis',t:'Double travel assistance',d:'You have travel assistance through your credit card and separate travel insurance with us.',a:100}
+];
+R['p-kate']=()=>{const d=ST.peeters.done,tot=SAVES.reduce((s,x)=>s+x.a,0),done=SAVES.filter(x=>d[x.k]).reduce((s,x)=>s+x.a,0);
+ return `${sub('08:14','Kate chooses you','p-seizoen')}<div class="scroll" style="padding-bottom:40px">
+ <div class="hero"><div class="big"><span style="color:#8CD656">${I.heart}</span><h2>I found ${eur(tot)} a year that you pay KBC but don’t need.</h2></div>
+ <p>Yes, that’s money KBC won’t earn. A customer who trusts us stays.</p></div>
+ <div class="sec" style="padding-top:16px"><div class="card" style="padding:4px 16px">${SAVES.map(x=>`<div class="save ${d[x.k]?'done':''}"><div class="tx2"><b>${x.t}</b><span>${x.d}</span><div class="pills" style="margin-top:8px">${d[x.k]?'<span style="color:#8CD656;font-weight:700;font-size:14px">✓ Done</span>':`<span class="pill sm" data-act="save" data-v="${x.k}">Do it for me</span>`}</div></div><div class="amt">${eur(x.a)}<small>per year</small></div></div>`).join('')}</div></div>
+ <div class="sec"><div class="card goal"><div style="display:flex;justify-content:space-between;font-size:15px"><b>Saved</b><b style="color:#8CD656">${eur(done)} / ${eur(tot)}</b></div><div class="bar"><i style="width:${done/tot*100}%"></i></div></div>
+  <div class="stack" style="padding:14px 0 0">${done<tot?'<span class="pill fill" data-act="saveAll">Do all three</span>':''}</div></div>
+ <div class="sec"><div class="card"><div class="tiph">${K}The Kate promise</div><div class="t" style="font-size:14.5px;line-height:1.55;color:var(--muted)">KBC’s margin plays no part in my advice. I rank options only by what they do for you, and I always show why.</div></div></div></div>`};
+
+/* ----- Yasmina ----- */
+function yasModel(){const y=ST.yas,N=30;let lo=1050,hi=1050,mid=1050;const L=[lo],H=[hi],M=[mid];
+ const cost={5:y.half?155:310,14:95,19:640};
+ for(let i=1;i<=N;i++){const c=25+(cost[i]||0);lo-=c;hi-=c;mid-=c;
+  if(i===3&&y.vos){lo+=1200;hi+=1200;mid+=1200} if(i===8&&!y.vos){hi+=1200;mid+=700} if(i===20){hi+=1900;mid+=950}
+  L.push(lo);H.push(hi);M.push(mid)}
+ return {L,H,M,spread:H[N]-L[N],low:Math.min(...L)};}
+R['y-mist']=()=>{const y=ST.yas,m=yasModel(),oranje=m.low<0;
+ return `${sub('10:20','Your weather report','y-mist',`<button class="iconbtn" data-sheet="lex">${I.info}</button>`)}<div class="scroll" style="padding-bottom:40px">
+ <div class="hero"><div class="big">${wx(m.spread>2000?'mist':'bewolkt',60)}<h2>${m.spread>2000?'Foggy: your income this month is uncertain.':'The fog is lifting.'}</h2></div>
+ <p>At the end of October you’ll be somewhere between <b style="color:var(--text)">${eur(m.L[30])}</b> and <b style="color:var(--text)">${eur(m.H[30])}</b>. Kate works with a range instead of a single number.</p></div>
+ <div class="sec" style="padding-top:14px"><div class="card chart" style="padding:14px 12px 10px">${lineChart(m.M,{lo:m.L,hi:m.H,max:4200,min:-900,col:'#AEB9C4',id:'y'})}<div class="legend"><span>1/10</span><span>31/10</span></div></div></div>
+ ${oranje?`<div class="sec" style="padding-top:12px"><div class="card orange" data-go="y-oranje" style="border-radius:12px"><div class="h">${wx('storm',18)} Weather warning code orange</div><p style="margin-top:8px">In the worst case you’re overdrawn from 20/10. Shall we look at it together now?</p><div class="pills"><span class="pill sm fill">View</span></div></div></div>`:`<div class="sec" style="padding-top:12px"><div class="card" style="border:1px solid #2E5A36;background:#16241A"><b>No more warning.</b> <span style="color:var(--muted)">Even in the worst case you stay above zero this month.</span></div></div>`}
+ <div class="sec"><div class="sechead"><h2>Outstanding invoices</h2></div><div class="card" style="padding:6px 16px">
+  <div class="kv"><span>Studio Vos · €1,200</span><b style="color:${y.vos?'#8CD656':'#FFA663'}">${y.vos?'paid':'18 days late'}</b></div>
+  <div class="kv"><span>Brouwerij De Ster · €1,900</span><b>expected around 20/10</b></div></div></div>
+ <div class="sec"><div class="sechead"><h2>Choose your weather</h2><span style="font-size:13px;color:var(--muted)">calculated live</span></div>
+  <div class="card" style="padding:4px 16px">${toggle('yas.vos','📨','Studio Vos pays','Kate sends a friendly reminder',y.vos)}${toggle('yas.half','🚗','Halve the car loan for 1 month','€155 instead of €310, no extra cost',y.half)}</div></div>
+ <p class="fine">Kate learns from your last 18 months: how late clients usually pay, and when your VAT prepayment is due.</p></div>`};
+R['y-oranje']=()=>`${sub('10:21','Code orange','y-mist')}<div class="scroll" style="padding-bottom:30px">
+ <div class="orange" style="margin:4px 16px 0;border-radius:12px;padding:16px"><div class="h">${wx('storm',18)} Weather warning code orange</div><h2>Yasmina, shall we take a look together?</h2><p>You’re not doing anything wrong. Two clients are paying late and your VAT prepayment is due on 20/10. We’d rather solve this now than in three months.</p></div>
+ <div class="sec" style="padding-top:14px"><div class="sechead"><h2>What’s possible</h2></div><div class="card" style="padding:6px 16px">
+  <div class="check"><span class="ck" style="background:#1E3A14;color:#8CD656">1</span><div><b>Halve your car loan for one month</b><small>no cost, the difference moves to the end</small></div></div>
+  <div class="check"><span class="ck" style="background:#1E3A14;color:#8CD656">2</span><div><b>Reminder to Studio Vos</b><small>friendly, from your own invoicing tool</small></div></div>
+  <div class="check"><span class="ck" style="background:#1E3A14;color:#8CD656">3</span><div><b>Spread your VAT prepayment</b><small>Kate prepares the request for you</small></div></div></div></div>
+ <div class="sec"><div class="card" style="display:flex;gap:12px;align-items:center"><span class="avatar" style="background:#2E3A45;color:var(--text)">K</span><div style="font-size:14.5px;line-height:1.45"><b>Karim, your personal contact</b><br><span style="color:var(--muted)">KBC branch Ghent-Sint-Pieters · already knows your situation</span></div></div></div>
+ <div class="stack"><span class="pill fill" data-act="toast" data-v="Karim will call you back today between 2 and 4 pm.">${I.phone} Have Karim call me back</span><span class="pill" data-act="yasFix">Do 1 and 2 for me</span><span class="textbtn" data-go="y-mist">Not now</span></div>
+ <p class="fine" style="padding-top:0">Kate sends no advertising about this and shares it with no one outside KBC.</p></div>`;
+
+/* ----- Jos ----- */
+R['j-zorg']=()=>`${status('10:02')}<div class="top"><span class="iconbtn">${I.gear}</span><div class="search">${I.search}How can I help?<span class="kate">${K}Kate</span></div><span class="iconbtn bell">${I.bell}</span></div><div class="scroll">
+ <div class="zorg"><div class="tiph" style="color:#B9CCE0">${K} Care mode is on</div><h2>We’re thinking of you, Jos.</h2><p>Since 12 September your bank runs at a gentler pace. You don’t need to do anything: we’re taking some work off your hands.</p></div>
+ <div class="sec" style="padding-top:16px"><div class="card" style="padding:6px 16px">
+  <div class="check"><span class="ck" style="background:#1E3A14;color:#8CD656">✓</span><div><b>No advertising or offers</b><small>14 messages held back since 12/09</small></div></div>
+  <div class="check"><span class="ck" style="background:#1E3A14;color:#8CD656">✓</span><div><b>One personal contact</b><small>Ann, Aalst branch. No call centre.</small></div></div>
+  <div class="check"><span class="ck" style="background:#1E3A14;color:#8CD656">✓</span><div><b>3 due dates postponed by 60 days</b><small>at no cost, automatically</small></div></div>
+  <div class="check"><span class="ck" style="background:#2A3238;color:var(--muted)">2/5</span><div><b>Estate</b><small>next step: appointment with the notary. Ann helps you.</small></div></div></div></div>
+ <div class="sec"><div class="card wx"><div class="wxtop">${K}Your weather</div><div class="wxnow">${wx('zon',48)}<div><div class="temp" style="font-size:26px">Calm</div><div class="sub">your pension arrives on 1/10,<br>all fixed costs are covered</div></div></div></div></div>
+ <div class="sec"><div class="card" style="display:flex;gap:12px;align-items:center"><span class="avatar" style="background:linear-gradient(145deg,#F6B1BD,#EE7079);color:#3B1117">E</span><div style="font-size:14.5px;line-height:1.45"><b>Els is your Guardian Angel</b><br><span style="color:var(--muted)">Your daughter keeps an eye on suspicious payments.</span></div></div></div>
+ <div class="stack"><span class="pill fill" data-act="toast" data-v="Ann will call you within the hour.">${I.phone} Call Ann</span><span class="textbtn">Stop care mode, whenever you want</span></div>
+ <div class="sec" style="padding-top:0"><button class="link" data-go="j-rood">Two weeks later… →</button></div></div>${tabbar}`;
+R['j-rood']=()=>`${sub('14:47','Transfer','j-zorg')}<div class="scroll" style="padding-bottom:30px">
+ <div class="alertband"><div class="h">${wx('storm',20)}Weather warning code red</div><h2>Jos, I’m holding this payment for a moment.</h2><p>It looks a lot like a known scam. Your money is safe, nothing has left your account.</p></div>
+ <div class="sec" style="padding-top:14px"><div class="card" style="padding:6px 16px"><div class="kv"><span>Amount</span><b>€2,450.00</b></div><div class="kv"><span>To</span><b>BE71 0961 2345 6769</b></div><div class="kv"><span>Name you entered</span><b>KBC Security Department</b></div></div>
+  <div class="shield">${I.shield}<div><b>Name does not match.</b> This account belongs to a private individual, not to KBC.</div></div></div>
+ <div class="sec"><div class="sechead"><h2>What Kate noticed</h2></div><div class="card"><div class="sig"><i></i>You’re on a call right now with a number that isn’t KBC’s.</div><div class="sig"><i></i>You have never paid this account number before.</div><div class="sig"><i></i>The amount is 30 times higher than your usual payments.</div><div class="sig"><i></i>You’re in care mode: that’s exactly when scammers strike.</div></div></div>
+ <div class="sec"><div class="card" style="display:flex;gap:12px;align-items:center"><span class="avatar" style="background:linear-gradient(145deg,#F6B1BD,#EE7079);color:#3B1117">E</span><div style="font-size:14.5px;line-height:1.45"><b>Els, your Guardian Angel, has been notified.</b><br><span style="color:var(--muted)">She and KBC Live are looking at this with you.</span></div></div></div>
+ <div class="stack"><span class="pill fill" data-act="voiceKate">${I.play} Kate explains</span><span class="pill" data-act="toast" data-v="KBC Live is calling you now. Hang up the other call first.">${I.phone} Call KBC Live now</span><span class="pill">Check your call</span><span class="textbtn">I know this person, I still want to pay</span></div>
+ <p class="fine" style="padding-top:0">KBC will never ask you to transfer money to a "safe account". Hang up if anyone asks.</p></div>`;
+
+/* ================= sheets ================= */
+const SHEETS={
+ lex:()=>`<h4>The weather lexicon</h4><div class="lex">${LEX.map(([k,n,d])=>`${wx(k,30)}<div><b>${n}</b><span>${d}</span></div>`).join('')}</div>`,
+ lotte:()=>`<h4>Why am I seeing this?</h4><ul class="why"><li>Your salary usually arrives on the last working day.</li><li>Fixed payments: phone, energy, Spotify, gym and your tenant insurance.</li><li>Last year you bought a gift around 6 October. Is it Sara’s birthday?</li><li>On a normal day you spend about €20.</li></ul><div class="pills" style="margin-top:16px"><span class="pill sm" data-act="closeSheet">That’s right</span><span class="pill sm">Adjust</span><span class="pill sm ghost" data-act="closeSheet">I’d rather not talk about this</span></div>`,
+ peeters:()=>`<h4>Why is Kate asking this?</h4><ul class="why"><li>New payment on 18/08 to a student landlord in Ghent.</li><li>An invoice from a university on 14/08.</li><li>Emma turns 18 this year.</li></ul><p class="why" style="margin-top:10px">Kate never guesses sensitive moments out loud. She asks first, and you decide.</p>`
+};
+
+/* ================= motor ================= */
+function motorHTML(){return `<h2>The engine behind the weather report</h2>
+<p class="lead">Every night the engine computes the weather for every customer. Detection and forecasting are cheap arithmetic. The language model only writes a message for those who actually receive something that day. Below, it really runs, in your browser, on synthetic customers.</p>
+<div class="mctl"><div class="seg" id="mseg">${[10000,100000,500000].map((n,i)=>`<button class="${i===1?'on':''}" data-n="${n}">${n.toLocaleString('en-GB')} customers</button>`).join('')}</div><span class="pill fill" id="mrun">▶ Run simulation</span></div>
+<div class="kpis"><div class="kpi2"><small>Customers processed</small><b id="k1">0</b><span id="k1s">&nbsp;</span></div><div class="kpi2"><small>Compute time</small><b id="k2">–</b><span id="k2s">&nbsp;</span></div><div class="kpi2"><small>For 2.3 million customers</small><b id="k3">–</b><span>on a single laptop</span></div><div class="kpi2"><small>Silence today</small><b id="k4">–</b><span>of customers get nothing</span></div></div>
+<div class="prog"><i id="mprog"></i></div>
+<div class="pipe"><div><small>Signals</small><b id="p1">–</b><small>transactions</small></div><div><small>Detection</small><b id="p2">–</b><small>moments</small></div><div><small>Forecast</small><b id="p3">–</b><small>weather reports</small></div><div><small>Playbooks</small><b id="p4">–</b><small>decisions</small></div><div class="acc"><small>Kate (LLM)</small><b id="p5">–</b><small>messages</small></div><div><small>Channels</small><b id="p6">–</b><small>app · push · API</small></div></div>
+<div class="mgrid"><div class="mbox"><h3>Detected moments</h3><div id="mbars"></div></div><div class="mbox"><h3>From the stream</h3><div class="feed" id="mfeed"><div style="color:#6F777F">Start the simulation.</div></div></div></div>
+<p class="fine" style="padding:14px 0 0">Synthetic customers with a fixed seed. Rules are simplified for the demo; in production this runs as a streaming job alongside existing fraud detection.</p>`}
+const MOM=[['rood','Code red · fraud','#D64040'],['zorg','Care mode · bereavement','#7394C2'],['oranje','Code orange · hardship','#F69D14'],['storm','Storm forecast','#EE7079'],['kot','Season · child leaves home','#E9C100'],['baby','Season · young family','#F6B1BD'],['verhuis','Season · moving house','#74C8ED'],['mist','Fog · uncertain income','#AEB9C4'],['donder','Thunder after a night out','#9FC95F']];
+function mulberry(a){return()=>{a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+let mRunning=false;
+function runMotor(N){
+  if(mRunning)return;mRunning=true;const r=mulberry(2300000);const c={};MOM.forEach(m=>c[m[0]]=0);let sent=0,det=0,tx=0,done=0;const feed=[];const t0=performance.now();let busy=0;
+  const step=()=>{const s=performance.now(),end=Math.min(N,done+25000);
+    for(let i=done;i<end;i++){
+      const age=18+(r()*72|0),free=r()<.08,n=40+(r()*60|0);tx+=n;
+      const f={rood:r()<.0006,zorg:age>55&&r()<.002,oranje:(free&&r()<.12)||r()<.004,storm:r()<.03,kot:age>=42&&age<=58&&r()<.05,baby:age>=25&&age<=40&&r()<.025,verhuis:r()<.012,mist:free,donder:age<40&&r()<.1};
+      let first=null;for(const [k] of MOM){if(f[k]){c[k]++;det++;if(!first)first=k}}
+      let send=false; if(first){ if(first==='donder') send=r()<.45; else if(first==='mist') send=false; else send=true; }
+      if(send)sent++;
+      if(first&&feed.length<400&&r()<.02){const conf=(70+r()*28|0);feed.push([i,age,first,conf,send])}
+    }
+    busy+=performance.now()-s;done=end;
+    const ms=busy, per=ms/done;
+    document.getElementById('k1').textContent=done.toLocaleString('en-GB');
+    document.getElementById('k1s').textContent=Math.round(tx/1e6*10)/10+' M transactions';
+    document.getElementById('k2').textContent=ms<1000?Math.round(ms)+' ms':(ms/1000).toFixed(1)+' s';
+    document.getElementById('k2s').textContent=(per*1000).toFixed(1)+' µs per customer';
+    const full=per*2.3e6/1000;document.getElementById('k3').textContent=full<60?full.toFixed(1)+' s':(full/60).toFixed(1)+' min';
+    document.getElementById('k4').textContent=Math.round((1-sent/done)*100)+'%';
+    document.getElementById('mprog').style.width=(done/N*100)+'%';
+    const f=x=>x.toLocaleString('en-GB');
+    document.getElementById('p1').textContent=f(tx);document.getElementById('p2').textContent=f(det);document.getElementById('p3').textContent=f(done);document.getElementById('p4').textContent=f(det);document.getElementById('p5').textContent=f(sent);document.getElementById('p6').textContent=f(sent);
+    const mx=Math.max(...Object.values(c),1);
+    document.getElementById('mbars').innerHTML=MOM.map(([k,n,col])=>`<div class="hb"><span>${n}</span><div class="track"><i style="width:${c[k]/mx*100}%;background:${col}"></i></div><em>${f(c[k])}</em></div>`).join('');
+    const nm=Object.fromEntries(MOM.map(m=>[m[0],m[1]]));
+    document.getElementById('mfeed').innerHTML=feed.slice(-12).reverse().map(([id,age,k,conf,s])=>`<div><span class="id">#${String(id).padStart(6,'0')}</span><span>${age} y · ${nm[k]} (${conf}%)</span><span style="margin-left:auto;color:${s?'#1A9FE4':'#6F777F'}">${s?'→ Kate':'silent'}</span></div>`).join('');
+    if(done<N)requestAnimationFrame(step);else mRunning=false;};
+  requestAnimationFrame(step);
+}
+
+/* ================= voice ================= */
+function speak(text,file,pitch){
+  speechSynthesis&&speechSynthesis.cancel();
+  const a=new Audio(file);
+  a.play().catch(()=>{ if(!('speechSynthesis' in window))return; const u=new SpeechSynthesisUtterance(text);u.lang='en-GB';const v=speechSynthesis.getVoices().find(v=>/en[-_]GB/i.test(v.lang))||speechSynthesis.getVoices().find(v=>/^en/i.test(v.lang));if(v)u.voice=v;u.rate=.95;u.pitch=pitch||1;speechSynthesis.speak(u)});
+}
+
+/* ================= engine ================= */
+const ACT={
+ sel:v=>{ST.lotte.sel=+v},
+ gsmLater:()=>{ST.lotte.gsm=false;ST.lotte.sel=0;showToast('Postponed. Kate will remind you about the phone on 31/10.')},
+ rate:v=>{ST.klimaat.r=+v},
+ voiceFuture:()=>{const k=ST.klimaat,r=k.r/12,n=504,tot=r?k.m*((Math.pow(1+r,n)-1)/r):k.m*n;speak(`Hey Lotte, it’s you, forty-two years from now. Remember how in 2026 you started putting ${k.m} euros a month aside? That’s now about ${Math.round(tot/1000)} thousand euros. Because of that, we could stop working at sixty. Thank you, kid.`,'future-you.mp3',.85)},
+ voiceKate:()=>speak('Hello Jos, this is Kate from KBC. I have held back your payment of two thousand four hundred and fifty euros. KBC will never ask you to send money to a safe account. Please hang up the call. Els and a colleague from KBC Live will call you in a moment.','kate-code-red.mp3',1),
+ agentStep:()=>{const a=ST.agent,q=AGQ[a.step%AGQ.length];a.step++;const allowed=a[q.need];
+   const res=allowed?`<span class="ok">200 OK</span>\n${q.ok()}`:`<span class="no">403 Forbidden</span>\n{ <span class="k">"error"</span>: "Lotte did not grant this permission" }`;
+   a.log.unshift(`<span style="color:#A3AAB1">Lotte → assistant: ${q.q}</span>\n<span class="m">${q.req}</span>\n${res}\n<span style="color:#C9D6E2">${allowed?q.say:'Your assistant: "I’m not allowed to do that. Want to do it yourself in KBC Mobile?"'}</span>`);a.log=a.log.slice(0,3)},
+ moment:v=>{ST.peeters.moment=v==='reset'?null:v},
+ save:v=>{ST.peeters.done[v]=true;showToast('Done. You’ll get a confirmation in your messages.')},
+ saveAll:()=>{SAVES.forEach(x=>ST.peeters.done[x.k]=true);showToast('All three done: €412 a year saved.')},
+ yasFix:()=>{ST.yas.vos=true;ST.yas.half=true;go('y-mist');showToast('Done. The fog is lifting.');draw(true)},
+ toast:v=>showToast(v),
+ closeSheet:()=>{sheet=null}
+};
+function showToast(t){toast=t;clearTimeout(showToast.t);showToast.t=setTimeout(()=>{toast=null;draw(true)},2600)}
+
+function draw(keep){
+  const s=SC[cur],scr=document.getElementById('screen');
+  const sc=scr.querySelector('.scroll'),top=keep&&sc?sc.scrollTop:0;
+  if(s.id==='m-motor'){document.getElementById('stage').style.display='none';const mo=document.getElementById('motor');mo.style.display='block';if(!mo.dataset.ok){mo.innerHTML=motorHTML();mo.dataset.ok=1;mo.querySelectorAll('#mseg button').forEach(b=>b.onclick=()=>{mo.querySelectorAll('#mseg button').forEach(x=>x.classList.remove('on'));b.classList.add('on')});mo.querySelector('#mrun').onclick=()=>runMotor(+mo.querySelector('#mseg .on').dataset.n)}}
+  else{document.getElementById('stage').style.display='';document.getElementById('motor').style.display='none';
+    if(s.id!=='l-chat'||!keep){scr.innerHTML=R[s.id]()+(sheet?`<div class="sheet" data-sheetbg><div class="in"><div class="grab"></div>${SHEETS[sheet]()}</div></div>`:'')+(toast?`<div class="toast">${toast}</div>`:'')}
+    else{scr.querySelectorAll('.sheet,.toast').forEach(x=>x.remove());if(sheet)scr.insertAdjacentHTML('beforeend',`<div class="sheet" data-sheetbg><div class="in"><div class="grab"></div>${SHEETS[sheet]()}</div></div>`);if(toast)scr.insertAdjacentHTML('beforeend',`<div class="toast">${toast}</div>`)}
+    const n=scr.querySelector('.scroll');if(n)n.scrollTop=top;}
+  // panel
+  const pk=s.p;
+  document.getElementById('personas').innerHTML=Object.entries(P).map(([k,v])=>`<button class="${k===pk?'on':''}" data-persona="${k}">${v.name}</button>`).join('');
+  document.getElementById('plabel').innerHTML=P[pk].desc;
+  document.getElementById('scenes').innerHTML=SC.map((x,i)=>x.p!==pk?'':`<button class="scene ${i===cur?'on':''}" data-idx="${i}"><b>${i+1}</b><span>${x.t}<small>${x.s}</small></span></button>`).join('');
+}
+function go(id){const i=typeof id==='number'?id:SC.findIndex(x=>x.id===id);if(i<0)return;cur=(i+SC.length)%SC.length;sheet=null;if(!go.keepToast)toast=null;go.keepToast=false;draw(false);if(SC[cur].id==='l-chat')playChat()}
+
+document.addEventListener('click',e=>{
+  const t=e.target;
+  if(t.closest('[data-sheetbg]')&&!t.closest('.in')){sheet=null;draw(true);return}
+  const nav=t.closest('[data-nav]');if(nav){const v=nav.dataset.nav;if(v==='r'){ST=init();go(0)}else go(cur+ +v);return}
+  const per=t.closest('[data-persona]');if(per){go(SC.findIndex(x=>x.p===per.dataset.persona));return}
+  const idx=t.closest('[data-idx]');if(idx){go(+idx.dataset.idx);return}
+  const tg=t.closest('[data-tog]');if(tg){const [a,b]=tg.dataset.tog.split('.');ST[a][b]=!ST[a][b];if(a==='lotte'&&b==='gsm')ST.lotte.sel=ST.lotte.gsm?8:0;draw(true);return}
+  const sh=t.closest('[data-sheet]');if(sh){sheet=sh.dataset.sheet;draw(true);return}
+  const ac=t.closest('[data-act]');if(ac){ACT[ac.dataset.act](ac.dataset.v);if(ac.dataset.act!=='yasFix')draw(true);return}
+  const g=t.closest('[data-go]');if(g&&!t.closest('#motor')){go(g.dataset.go);return}
+});
+document.addEventListener('input',e=>{const r=e.target.closest('[data-range]');if(r){const [a,b]=r.dataset.range.split('.');ST[a][b]=+r.value;document.getElementById('kamt').textContent=eur(ST.klimaat.m);document.getElementById('kdyn').innerHTML=klimDyn()}});
+addEventListener('keydown',e=>{if(e.target.tagName==='INPUT')return;if(e.key==='ArrowRight'||e.key===' '){e.preventDefault();go(cur+1)}if(e.key==='ArrowLeft')go(cur-1);if(e.key==='r'||e.key==='R'){ST=init();go(0)}});
+function fit(){const st=document.getElementById('stage');const sc=Math.min(1,(innerHeight-40)/864,(innerWidth-24)/410);st.style.transform=`scale(${sc})`;if(innerWidth<=820){st.style.height=(864*sc)+'px';st.style.transformOrigin='top center'}}
+addEventListener('resize',fit);fit();
+if('speechSynthesis' in window)speechSynthesis.getVoices();
+go(0);
+</script>
+</body>
+</html>
