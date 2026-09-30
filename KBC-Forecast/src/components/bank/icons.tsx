@@ -1,93 +1,96 @@
-import Svg, { Circle, Defs, Ellipse, G, Line, LinearGradient, Path, Polygon, Rect, Stop } from 'react-native-svg';
+import type { ReactNode } from 'react';
+import Svg, { Circle, Ellipse, G, Line, Path, Rect } from 'react-native-svg';
 
-import { Bank } from '@/constants/bank-theme';
+import { Color } from '@/constants/bank-theme';
 import type { WeatherType } from '@/data/demo';
 
-const paths = {
-  wallet: 'M19 7H5a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2ZM4 7V5l13-3v3M17 14h.01',
-  piggy: 'M7 5a4 4 0 0 1 7-1M5 8C2 8 2 12 4 13l1 4 2 1v3h3l1-2h5l1 2h3v-4l2-2v-5h-3l-2-3 1-4-5 3H9a7 7 0 0 0-4 2ZM16 10h.01',
-  settings: 'm9 3 1-2h4l1 2 3 2 2-.2 2 3-1 2v4l1 2-2 3-2-.2-3 2-1 2h-4l-1-2-3-2-2 .2-2-3 1-2v-4l-1-2 2-3 2 .2 3-2ZM16 12a4 4 0 1 0-8 0 4 4 0 0 0 8 0Z',
-  search: 'M16 16l5 5M18 10a8 8 0 1 0-16 0 8 8 0 0 0 16 0Z',
-  bell: 'M5 9a7 7 0 0 1 14 0v7l2 3H3l2-3V9ZM9 22h6',
-  home: 'm2 10 10-8 10 8M5 8v13h5v-7h4v7h5V8',
-  news: 'M7 3h14v18H5a2 2 0 0 1-2-2V6h4M7 3v16M10 7h8v5h-8ZM10 16h8',
-  directions: 'M12 2v20M4 5h14l3 3-3 3H4V5ZM20 14H6l-3 3 3 3h14v-6Z',
-  list: 'M8 5h13M8 12h13M8 19h13M3 5h.01M3 12h.01M3 19h.01',
-  layers: 'm12 2 10 5-10 5L2 7l10-5ZM2 12l10 5 10-5M2 17l10 5 10-5',
-  transfer: 'M3 7h18l-5-5M21 17H3l5 5M21 7l-5 5M3 17l5-5',
-  up: 'm5 15 7-7 7 7',
-  down: 'm5 9 7 7 7-7',
-  right: 'm9 5 7 7-7 7',
-  arrow: 'M3 12h18m-7-7 7 7-7 7',
-  close: 'm6 6 12 12M6 18 18 6',
-  plus: 'M12 5v14M5 12h14',
-  check: 'm5 12 4 4L19 6',
-  edit: 'm15 4 5 5M4 15 16 3l5 5L9 20l-6 1 1-6ZM3 23h18',
-  info: 'M12 11v6M12 7h.01M22 12a10 10 0 1 0-20 0 10 10 0 0 0 20 0Z',
-  shield: 'M12 2 3 6v6c0 5 9 10 9 10s9-5 9-10V6l-9-4Zm-5 10 3 3 7-7',
-  calendar: 'M7 2v4M17 2v4M3 9h18M5 4h14a2 2 0 0 1 2 2v14H3V6a2 2 0 0 1 2-2ZM7 13h2M15 13h2M7 17h2',
-  reset: 'M3 10a9 9 0 1 1 1 8M3 3v7h7',
-  play: 'm8 4 12 8-12 8V4Z',
-  heart: 'M12 21 3 12C-3 4 7-2 12 6c5-8 15-2 9 6l-9 9Z',
-  graduation: 'm1 8 11-5 11 5-11 5L1 8ZM5 10v7c4 4 10 4 14 0v-7M23 8v9',
-  headphones: 'M3 13V11a9 9 0 0 1 18 0v7M3 13h4v8H3v-8Zm14 0h4v8h-4v-8Z',
-  airplane: 'm22 2-8 20-4-8-8-4L22 2ZM10 14 22 2',
-  lock: 'M6 10V7a6 6 0 0 1 12 0v3M4 10h16v12H4V10ZM12 15v3',
-  grip: 'M8 5h.01M16 5h.01M8 12h.01M16 12h.01M8 19h.01M16 19h.01',
-} as const;
+// Line icons from the mockup (24×24 grid, 1.6 stroke). Everything decorative is hidden from screen readers;
+// the pressable around an icon carries the accessibility label.
+const glyphs = {
+  gear: <><Circle cx="12" cy="12" r="3" /><Path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z" /></>,
+  search: <><Circle cx="11" cy="11" r="7" /><Path d="m20 20-3.5-3.5" /></>,
+  bell: <><Path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" /><Path d="M10.3 21a1.9 1.9 0 0 0 3.4 0" /></>,
+  wallet: <><Path d="M4 7h14a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V7z" /><Path d="M4 7l11-3v3" /><Circle cx="16" cy="13.5" r=".8" fill="currentColor" /></>,
+  news: <Path d="M5 3h15v18H5a2 2 0 0 1-2-2V7h2M5 3v16M9 7h7M9 11h7M9 15h5" />,
+  house: <><Path d="M3 11 12 4l9 7" /><Path d="M5 10v10h14V10" /></>,
+  sign: <Path d="M12 3v18M5 6h12l2 2-2 2H5zM19 13H7l-2 2 2 2h12z" />,
+  star: <Path d="m12 3 2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1-4.4-4.3 6.1-.9z" />,
+  plus: <><Circle cx="12" cy="12" r="9" /><Path d="M12 8v8M8 12h8" /></>,
+  hex: <Path d="M9 5l3-2 3 2v3l-3 2-3-2zM4 12l3-2 3 2v3l-3 2-3-2zM14 12l3-2 3 2v3l-3 2-3-2zM9 17l3-2 3 2v3l-3 2-3-2z" />,
+  coins: <><Ellipse cx="10" cy="8" rx="6" ry="2.5" /><Path d="M4 8v4c0 1.4 2.7 2.5 6 2.5s6-1.1 6-2.5V8M4 12v4c0 1.4 2.7 2.5 6 2.5s6-1.1 6-2.5v-4" /></>,
+  swap: <Path d="M4 8h15M15 4l4 4-4 4M20 16H5M9 12l-4 4 4 4" />,
+  list: <><Circle cx="4.5" cy="6" r="1.2" /><Circle cx="4.5" cy="12" r="1.2" /><Circle cx="4.5" cy="18" r="1.2" /><Rect x="8" y="4.5" width="13" height="3" rx="1.5" /><Rect x="8" y="10.5" width="13" height="3" rx="1.5" /><Rect x="8" y="16.5" width="13" height="3" rx="1.5" /></>,
+  piggy: <><Path d="M19 10c1 .4 2 1.4 2 2.5v1.5h-2c-.6 1.6-1.8 2.8-3 3.4V20h-3v-2h-3v2H7v-2.8A6.5 6.5 0 0 1 11.5 6c2.4 0 4.6 1.2 5.8 3z" /><Path d="M13 4.5a2 2 0 0 1 3 1.5" /><Circle cx="16" cy="11" r=".6" fill="currentColor" /></>,
+  layers: <><Path d="m12 3 9 5-9 5-9-5z" /><Path d="m3 12 9 5 9-5M3 16l9 5 9-5" /></>,
+  back: <Path d="M20 12H4M10 6l-6 6 6 6" />,
+  close: <Path d="M5 5l14 14M19 5 5 19" />,
+  info: <><Circle cx="12" cy="12" r="9" /><Path d="M12 11v5M12 8h.01" /></>,
+  mic: <><Rect x="9" y="3" width="6" height="11" rx="3" /><Path d="M5 11a7 7 0 0 0 14 0M12 18v3" /></>,
+  up: <Path d="m6 15 6-6 6 6" />,
+  phone: <Path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2" />,
+} satisfies Record<string, ReactNode>;
 
-export type IconName = keyof typeof paths | 'kate';
+export type IconName = keyof typeof glyphs | 'wallet-filled' | 'coins-plus' | 'coins-minus' | 'shield' | 'storm-small';
 
-export function Icon({ name, size = 24, color = Bank.navy, strokeWidth = 1.7 }: { name: IconName; size?: number; color?: string; strokeWidth?: number }) {
-  if (name === 'kate') return (
-    <Svg width={size} height={size} viewBox="0 0 32 32" accessible={false}>
-      <Circle cx="16" cy="16" r="14.5" fill="#F8FDFF" stroke="#B2E3F5" strokeWidth="1.5" />
-      <Circle cx="16" cy="16" r="12.5" fill="none" stroke="#E1F5FC" />
-      <G stroke={color === Bank.navy ? Bank.blue : color} strokeWidth="2" strokeLinecap="round">
-        <Line x1="14" y1="9" x2="17" y2="9" /><Line x1="11" y1="13" x2="20" y2="13" />
-        <Line x1="9" y1="17" x2="22" y2="17" /><Line x1="13" y1="21" x2="18" y2="21" /><Line x1="15" y1="24" x2="16" y2="24" />
-      </G>
-    </Svg>
-  );
-  return <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" accessible={false}><Path d={paths[name]} stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" /></Svg>;
+export function Icon({ name, size = 24, color = Color.text, strokeWidth = 1.6 }: { name: IconName; size?: number; color?: string; strokeWidth?: number }) {
+  const svg = (children: ReactNode, props: object = {}) => <Svg width={size} height={size} viewBox="0 0 24 24" {...props}>{children}</Svg>;
+  switch (name) {
+    case 'wallet-filled':
+      return svg(<><Path d="M4 7h14a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V7z" fill={color} /><Path d="M4 7l11-3v3" stroke={color} strokeWidth={1.6} fill="none" /><Circle cx="16" cy="13.5" r="1" fill={Color.tabBar} /></>);
+    case 'coins-plus':
+    case 'coins-minus':
+      return svg(<G fill="none" stroke={color} strokeWidth={1.5}>{glyphs.coins}{name === 'coins-plus' ? <Path d="M19 3v4M17 5h4" /> : <Path d="M17 5h4" />}</G>);
+    case 'shield':
+      return svg(<><Path d="M12 3 4 6v6c0 5 3.4 8 8 9 4.6-1 8-4 8-9V6z" fill="#DC7507" /><Path d="M12 8v5M12 16h.01" stroke="#231300" strokeWidth={2} strokeLinecap="round" /></>);
+    case 'storm-small':
+      return svg(<><Path d="M7 16a4.5 4.5 0 1 1 1-8.9A6 6 0 0 1 19.5 9 3.5 3.5 0 0 1 18 16z" fill={Color.alertText} /><Path d="m13 13-3 5h3l-2 4" stroke={Color.red} strokeWidth={2} fill="none" strokeLinecap="round" strokeLinejoin="round" /></>);
+    default:
+      return svg(<G fill="none" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round">{glyphs[name]}</G>, { color });
+  }
 }
 
-export function WeatherIcon({ type, size = 48 }: { type: WeatherType; size?: number }) {
-  const showSun = type === 'sun' || type === 'cloud' || type === 'rainbow';
-  const showCloud = !['sun', 'fog', 'rainbow'].includes(type);
-  const dark = type === 'storm' || type === 'thunder';
-  return (
-    <Svg width={size} height={size} viewBox="0 0 100 100" accessible={false}>
-      <Defs>
-        <LinearGradient id={`sun-${type}`} x1="0" y1="0" x2="1" y2="1"><Stop offset="0" stopColor="#FFDC85" /><Stop offset="1" stopColor="#F6AD36" /></LinearGradient>
-        <LinearGradient id={`cloud-${type}`} x1="0" y1="0" x2="0" y2="1"><Stop offset="0" stopColor={dark ? '#9DA8CC' : '#FFFFFF'} /><Stop offset="1" stopColor={dark ? '#6677A5' : '#D4E7F1'} /></LinearGradient>
-      </Defs>
-      {showSun && <G transform={type === 'cloud' ? 'translate(-4,-7) scale(.82)' : ''}>
-        <Circle cx="50" cy="47" r="36" fill="#FFC954" opacity=".10" />
-        <G stroke="#F2B946" strokeWidth="3" strokeLinecap="round">
-          {[0, 45, 90, 135, 180, 225, 270, 315].map(angle => <Line key={angle} x1="50" y1="8" x2="50" y2="14" transform={`rotate(${angle} 50 47)`} />)}
-        </G>
-        <Circle cx="50" cy="47" r="24" fill={`url(#sun-${type})`} />
-        <Path d="M34 40a18 18 0 0 1 18-12" stroke="#FFF0C6" strokeWidth="3" strokeLinecap="round" fill="none" />
-      </G>}
-      {showCloud && <G>
-        <Ellipse cx="53" cy="77" rx="31" ry="5" fill="#193D62" opacity=".06" />
-        <Path d="M26 72a16 16 0 0 1-2-32 25 25 0 0 1 47-8 20 20 0 0 1 6 40Z" fill={`url(#cloud-${type})`} />
-        <Path d="M27 45a20 20 0 0 1 36-9" fill="none" stroke={dark ? '#C1C9E0' : '#FFF'} strokeWidth="3" strokeLinecap="round" />
-      </G>}
-      {(type === 'rain' || type === 'storm') && <G stroke="#329DCE" strokeWidth="4" strokeLinecap="round"><Line x1="31" y1="79" x2="27" y2="88" /><Line x1="51" y1="79" x2="47" y2="88" /><Line x1="71" y1="79" x2="67" y2="88" /></G>}
-      {(type === 'thunder' || type === 'storm') && <Path d="m52 59-11 20h12l-5 16 21-25H56l7-11Z" fill="#FFD15D" stroke="#EAB846" strokeWidth="1" strokeLinejoin="round" />}
-      {type === 'fog' && <G stroke="#9FB6C4" strokeWidth="6" strokeLinecap="round"><Line x1="22" y1="31" x2="76" y2="31" /><Line x1="13" y1="46" x2="84" y2="46" /><Line x1="21" y1="61" x2="72" y2="61" /><Line x1="31" y1="76" x2="79" y2="76" /></G>}
-      {type === 'rainbow' && <G fill="none" strokeWidth="7" strokeLinecap="round"><Path d="M13 79a37 37 0 0 1 74 0" stroke="#EAA2A0" /><Path d="M21 79a29 29 0 0 1 58 0" stroke="#FFD47E" /><Path d="M29 79a21 21 0 0 1 42 0" stroke="#81C8BE" /><Path d="M37 79a13 13 0 0 1 26 0" stroke="#9AC8E8" /></G>}
-    </Svg>
-  );
-}
-
-export function CardPattern() {
-  return <Svg width="100%" height="100%" viewBox="0 0 180 120" preserveAspectRatio="xMidYMid slice" accessible={false}>
-    <Rect width="180" height="120" fill="#35BFEA" />
-    <Polygon points="0,0 85,0 19,90" fill="#6DD1EE" /><Polygon points="85,0 180,0 104,64" fill="#51C8ED" />
-    <Polygon points="0,70 104,64 68,120 0,120" fill="#00AFE3" /><Polygon points="104,64 180,33 180,120 138,120" fill="#5DD0EF" />
-    <Polygon points="85,0 104,64 19,90" fill="#21B6E7" opacity=".65" /><Polygon points="104,64 138,120 68,120" fill="#49C4EB" />
+/** KBC "K" mark as used in the Kate logo. */
+export function KateMark({ size = 16, color = Color.blue, badge = true }: { size?: number; color?: string; badge?: boolean }) {
+  const mark = <G>
+    <Rect x="1" y="2" width="8" height="1.4" rx=".7" fill={color} />
+    <Rect x="2.5" y="4.3" width="5" height="1.4" rx=".7" fill={color} />
+    <Rect x="1" y="6.6" width="8" height="1.4" rx=".7" fill={color} />
+  </G>;
+  if (!badge) return <Svg width={size} height={size} viewBox="0 0 10 10">{mark}</Svg>;
+  // Mockup: 16 px light-blue disc with a 10 px mark, i.e. mark spans 10/16 of the badge.
+  return <Svg width={size} height={size} viewBox="0 0 16 16">
+    <Circle cx="8" cy="8" r="8" fill={Color.kateBubble} />
+    <G transform="translate(3 3)">{mark}</G>
   </Svg>;
+}
+
+const CLOUD = 'M7 18a4.5 4.5 0 1 1 1-8.9A6 6 0 0 1 19.5 11 3.5 3.5 0 0 1 18 18z';
+
+function Sun({ cx, cy, r }: { cx: number; cy: number; r: number }) {
+  return <G>
+    <G stroke={Color.yellow} strokeWidth={1.8} strokeLinecap="round">
+      {[0, 45, 90, 135, 180, 225, 270, 315].map(angle => {
+        const rad = (angle * Math.PI) / 180;
+        return <Line key={angle} x1={cx + Math.cos(rad) * (r + 2.5)} y1={cy + Math.sin(rad) * (r + 2.5)} x2={cx + Math.cos(rad) * (r + 5)} y2={cy + Math.sin(rad) * (r + 5)} />;
+      })}
+    </G>
+    <Circle cx={cx} cy={cy} r={r} fill={Color.yellow} />
+  </G>;
+}
+
+const bolt = (color: string, width: number) => <Path d="m13 12-3 5h3.5l-2 5" stroke={color} strokeWidth={width} fill="none" strokeLinecap="round" strokeLinejoin="round" />;
+
+/** Weather glyphs from the mockup: flat, readable at 26 px in the week row. */
+export function WeatherIcon({ type, size = 28 }: { type: WeatherType; size?: number }) {
+  let body: ReactNode = null;
+  if (type === 'sun') body = <Sun cx={12} cy={12} r={5} />;
+  if (type === 'cloud') body = <><Sun cx={9} cy={8.5} r={3.6} /><Path d={CLOUD} fill="#C9D3DC" transform="translate(1.5 1.5) scale(.9)" /></>;
+  if (type === 'rain') body = <><Path d={CLOUD} transform="translate(0 -3)" fill="#AFC0CF" /><Path d="M8 18l-1 3M12 18l-1 3M16 18l-1 3" stroke={Color.rain} strokeWidth={1.8} strokeLinecap="round" /></>;
+  if (type === 'thunder') body = <><Path d={CLOUD} transform="translate(0 -3)" fill="#8997A5" />{bolt(Color.orange, 2)}</>;
+  if (type === 'storm') body = <><Path d={CLOUD} transform="translate(0 -3)" fill="#5F6B77" />{bolt(Color.red, 2.2)}<Path d="M7 17l-1.5 3M18 17l-1.5 3" stroke={Color.rain} strokeWidth={1.8} strokeLinecap="round" /></>;
+  if (type === 'rainbow') body = <G fill="none" strokeWidth={1.8}>
+    <Path d="M3 17a9 9 0 0 1 18 0" stroke="#EE7079" /><Path d="M5.5 17a6.5 6.5 0 0 1 13 0" stroke={Color.yellow} />
+    <Path d="M8 17a4 4 0 0 1 8 0" stroke={Color.green} /><Path d="M10.3 17a1.7 1.7 0 0 1 3.4 0" stroke={Color.rain} />
+  </G>;
+  return <Svg width={size} height={size} viewBox="0 0 24 24">{body}</Svg>;
 }

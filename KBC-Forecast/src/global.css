@@ -1,6 +1,6 @@
 :root {
   --font-display:
-    Lato_400Regular, system-ui, sans-serif, Apple Color Emoji, Segoe UI Emoji,
+    NunitoSans_400Regular, system-ui, sans-serif, Apple Color Emoji, Segoe UI Emoji,
     Segoe UI Symbol, Noto Color Emoji;
   --font-mono:
     ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, Liberation Mono, Courier New, monospace;
@@ -11,14 +11,14 @@
 html, body, #root {
   height: 100%;
   margin: 0;
-  background: #eef3f6;
+  background: #05080b;
 }
 
 body { overscroll-behavior-y: none; }
 
 button, input, [role='button'] { -webkit-tap-highlight-color: transparent; }
 
-:focus-visible { outline: 2px solid #009edd; outline-offset: 3px; }
+:focus-visible { outline: 2px solid #1a9fe4; outline-offset: 3px; }
 
 @media (prefers-reduced-motion: reduce) {
   * { scroll-behavior: auto !important; }

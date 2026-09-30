@@ -1,120 +1,195 @@
 import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
+import Svg, { Circle, Defs, LinearGradient, Rect, Stop, Text as SvgText } from 'react-native-svg';
 
-import { CardPattern, Icon, type IconName } from './icons';
-import { IconButton, T } from './ui';
-import { Bank, cardShadow } from '@/constants/bank-theme';
-import { dateLabel, euro, type Account, type Notice, type Transaction } from '@/data/demo';
+import { Icon, KateMark, type IconName } from './icons';
+import { Card, IconButton, ProgressBar, styles as ui, T } from './ui';
+import { Color, hitSlopFor, Radius, Space, Touch } from '@/constants/bank-theme';
+import { ACCOUNTS, eurCents, GOAL, IN_OUT, TRANSACTIONS } from '@/data/demo';
 
-export type Utility = 'settings' | 'kate' | 'notifications' | 'MyNWS' | 'MyHome' | 'MyMobility' | 'Mijn KBC' | 'Beleggen' | 'Aanbod' | 'transfer';
-
-export function BankHeader({ unread, onOpen }: { unread: boolean; onOpen: (utility: Utility) => void }) {
-  return <View>
-    <View style={styles.header}>
-      <IconButton testID="demo-settings" name="settings" label="Instellingen en demo bedienen" onPress={() => onOpen('settings')} style={styles.roundButton} />
-      <Pressable accessibilityRole="button" accessibilityLabel="Vraag het aan Kate" onPress={() => onOpen('kate')} style={({ pressed }) => [styles.kateSearch, pressed && { opacity: 0.7 }]}>
-        <Icon name="search" size={16} color="#84A5C6" />
-        <T numberOfLines={1} style={styles.searchPlaceholder}>Hoe kan ik je helpen?</T>
-        <View style={styles.kateLogo}><Icon name="kate" size={18} /><T bold style={styles.kateWord}>Kate</T></View>
-      </Pressable>
-      <View><IconButton name="bell" label={unread ? 'Meldingen, nieuwe berichten' : 'Meldingen'} onPress={() => onOpen('notifications')} style={styles.roundButton} />{unread && <View pointerEvents="none" style={styles.notificationDot} />}</View>
+export function BankHeader({ unread, onSettings, onKate, onBell }: { unread: boolean; onSettings: () => void; onKate: () => void; onBell: () => void }) {
+  return <View style={styles.top}>
+    <IconButton testID="demo-settings" name="gear" label="Instellingen en demo-scènes" onPress={onSettings} style={styles.topButton} />
+    <Pressable testID="kate-search" accessibilityRole="button" accessibilityLabel="Hoe kan ik je helpen? Vraag het aan Kate" onPress={onKate} style={({ pressed }) => [styles.search, pressed && ui.pressed]}>
+      <Icon name="search" size={20} color={Color.muted} />
+      <T numberOfLines={1} style={styles.searchText}>Hoe kan ik je helpen?</T>
+      <View style={styles.kate}><KateMark /><T weight="extrabold" style={{ fontSize: 15 }}>Kate</T></View>
+    </Pressable>
+    <View>
+      <IconButton name="bell" label={unread ? 'Meldingen, nieuwe melding' : 'Meldingen'} onPress={onBell} color={Color.blue} style={styles.topButton} />
+      {unread && <View style={[styles.bellDot, { pointerEvents: 'none' }]} />}
     </View>
-    <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.categories}>
-      <View accessibilityLabel="Mijn geld, geselecteerd" style={styles.activeCategory}><Icon name="wallet" size={21} color={Bank.white} /></View>
-      {(['MyNWS', 'MyHome', 'MyMobility'] as const).map((label, index) => <Pressable key={label} accessibilityRole="button" onPress={() => onOpen(label)} style={({ pressed }) => [styles.category, pressed && { opacity: 0.65 }]}><Icon name={(['news', 'home', 'directions'] as const)[index]} size={19} color="#567C9F" /><T bold style={styles.categoryLabel}>{label}</T></Pressable>)}
-    </ScrollView>
   </View>;
 }
 
-export function Accounts({ accounts, onAccount, onEdit }: { accounts: Account[]; onAccount: (account: Account) => void; onEdit: () => void }) {
-  return <View style={styles.accountsSection}>
-    <View style={styles.sectionHeading}><T bold accessibilityRole="header" style={styles.heading}>Je rekeningen</T><IconButton name="edit" label="Rekeningen personaliseren" onPress={onEdit} color={Bank.blue} /></View>
-    <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.accounts}>
-      {accounts.map((account, index) => <Pressable key={account.id} testID={`account-${index}`} accessibilityRole="button" accessibilityLabel={`${account.label}, ${euro(account.balance)}`} onPress={() => onAccount(account)} style={({ pressed }) => [styles.account, pressed && { opacity: 0.8 }]}>
-        <View style={styles.accountArt}><View style={StyleSheet.absoluteFill}><CardPattern /></View><Icon name={account.kind} color="white" size={48} strokeWidth={1.25} /></View>
-        <View style={styles.accountContent}><T numberOfLines={1} style={styles.accountOwner}>{account.owner}</T><T bold numberOfLines={1} style={styles.accountBalance}>{euro(account.balance, false)} <T bold style={{ fontSize: 10 }}>EUR</T></T><T numberOfLines={1} style={styles.accountLabel}>{account.label}</T></View>
-        <View style={[styles.accountIndicator, index === 0 && { backgroundColor: Bank.blue }]} />
-      </Pressable>)}
-    </ScrollView>
-  </View>;
-}
+const CHIPS: { label: string; icon: IconName }[] = [{ label: 'MyNWS', icon: 'news' }, { label: 'MyHome', icon: 'house' }, { label: 'MyMobility', icon: 'sign' }];
 
-export function Transactions({ transactions, visible, onToggle, onTransaction }: { transactions: Transaction[]; visible: boolean; onToggle: () => void; onTransaction: (transaction: Transaction) => void }) {
-  return <View style={styles.transactions}>
-    {visible && transactions.slice(0, 3).map(transaction => <Pressable key={transaction.id} accessibilityRole="button" accessibilityLabel={`${transaction.merchant}, ${euro(transaction.amount)}${transaction.status ? `, ${transaction.status === 'held' ? 'tegengehouden' : 'geannuleerd'}` : ''}`} onPress={() => onTransaction(transaction)} style={({ pressed }) => [styles.transaction, pressed && { opacity: 0.6 }]}>
-      <T style={styles.transactionDate}>{dateLabel(transaction.date, { day: '2-digit', month: '2-digit' })}</T>
-      <View style={{ flex: 1, gap: 1 }}><T numberOfLines={1} style={styles.merchant}>{transaction.merchant}</T>{transaction.status && <T bold style={{ fontSize: 10, lineHeight: 14, color: transaction.status === 'held' ? Bank.red : Bank.green }}>{transaction.status === 'held' ? 'Tegengehouden' : 'Geannuleerd'}</T>}</View>
-      <T bold style={[styles.transactionAmount, transaction.status === 'cancelled' && { textDecorationLine: 'line-through', color: Bank.muted }]}>{euro(transaction.amount, false)} <T style={{ fontSize: 10 }}>EUR</T></T>
+export function Chips({ onChip }: { onChip: (label: string) => void }) {
+  return <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.chips}>
+    <View accessible accessibilityLabel="Mijn geld, geselecteerd" style={[styles.chip, styles.chipSelected]}><Icon name="wallet" size={20} color="#111111" /></View>
+    {CHIPS.map(chip => <Pressable key={chip.label} accessibilityRole="button" onPress={() => onChip(chip.label)} hitSlop={hitSlopFor(0, 32)} style={({ pressed }) => [styles.chip, pressed && ui.pressed]}>
+      <Icon name={chip.icon} size={18} color={Color.chipText} /><T style={styles.chipText}>{chip.label}</T>
     </Pressable>)}
-    <Pressable testID="toggle-payments" accessibilityRole="button" accessibilityState={{ expanded: visible }} onPress={onToggle} style={styles.togglePayments}><Icon name={visible ? 'up' : 'down'} color={Bank.blue} size={18} /><T bold style={{ color: Bank.blue, fontSize: 12 }}>{visible ? 'Verberg betalingen' : 'Toon betalingen'}</T></Pressable>
+  </ScrollView>;
+}
+
+function AccountArt({ art }: { art: 'lotte' | 'sunset' }) {
+  if (art === 'lotte') return <Svg width="100%" height="100%" viewBox="0 0 128 92" preserveAspectRatio="xMidYMid slice">
+    <Defs><LinearGradient id="acct-blue" x1="0" y1="0" x2="1" y2="1"><Stop offset="0" stopColor="#46ADE0" /><Stop offset="1" stopColor="#0B5E93" /></LinearGradient></Defs>
+    <Rect width="128" height="92" fill="url(#acct-blue)" />
+    <Circle cx="98" cy="22" r="30" fill="#fff" opacity=".12" /><Circle cx="24" cy="80" r="40" fill="#fff" opacity=".08" />
+    <SvgText x="14" y="54" fill="#fff" fontSize="22" fontWeight="800" fontFamily="NunitoSans_800ExtraBold">Lotte</SvgText>
+  </Svg>;
+  return <Svg width="100%" height="100%" viewBox="0 0 128 92" preserveAspectRatio="xMidYMid slice">
+    <Defs><LinearGradient id="acct-sunset" x1="0.2" y1="0" x2="0.8" y2="1"><Stop offset="0" stopColor="#F69D14" /><Stop offset="0.55" stopColor="#EE7079" /><Stop offset="1" stopColor="#7C45B6" /></LinearGradient></Defs>
+    <Rect width="128" height="92" fill="url(#acct-sunset)" />
+    <Circle cx="64" cy="70" r="26" fill="#FFD66B" /><Rect y="68" width="128" height="24" fill="#2B2350" opacity=".7" />
+  </Svg>;
+}
+
+export function Accounts({ onAccount, onFavorites, onNew }: { onAccount: (name: string) => void; onFavorites: () => void; onNew: () => void }) {
+  return <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.accounts}>
+    {ACCOUNTS.map((account, index) => <Pressable key={account.id} testID={`account-${account.id}`} accessibilityRole="button" accessibilityLabel={`${account.name}, ${eurCents(account.balance)} euro${index === 0 ? ', geselecteerd' : ''}`} onPress={() => onAccount(account.name)} style={({ pressed }) => [styles.account, pressed && ui.pressed]}>
+      <View style={styles.accountArt}><AccountArt art={account.art} /></View>
+      <T numberOfLines={1} style={styles.accountName}>{account.name}</T>
+      <T bold style={styles.accountBalance}>€ {eurCents(account.balance)}</T>
+      {index === 0 && <View style={styles.accountSelected} />}
+    </Pressable>)}
+    <View style={[styles.account, styles.accountSmall]}>
+      <Pressable accessibilityRole="button" onPress={onFavorites} style={({ pressed }) => [styles.smallAction, pressed && ui.pressed]}><Icon name="star" size={22} color={Color.muted} /><T style={styles.smallText}>Wijzig favorieten</T></Pressable>
+      <Pressable accessibilityRole="button" accessibilityLabel="Nieuwe rekening" onPress={onNew} style={({ pressed }) => [styles.smallAction, pressed && ui.pressed]}><Icon name="plus" size={22} color={Color.green} /><T style={styles.smallText}>Nieuw</T></Pressable>
+    </View>
+  </ScrollView>;
+}
+
+export function Transactions({ visible, onToggle }: { visible: boolean; onToggle: () => void }) {
+  return <View style={styles.tx}>
+    {visible && TRANSACTIONS.map(item => <View key={item.id} style={styles.txRow} accessible accessibilityLabel={`${item.date}, ${item.merchant}, ${eurCents(item.amount, true)} euro`}>
+      <T style={styles.txDate}>{item.date}</T>
+      <T style={styles.txName} numberOfLines={1}>{item.merchant}</T>
+      <T weight="semibold" style={[styles.txAmount, item.amount > 0 && { color: Color.positive }]}>{eurCents(item.amount, true)}</T>
+    </View>)}
+    <Pressable testID="toggle-payments" accessibilityRole="button" accessibilityState={{ expanded: visible }} onPress={onToggle} style={styles.txToggle}>
+      <View style={{ transform: [{ rotate: visible ? '0deg' : '180deg' }] }}><Icon name="up" size={16} color={Color.blue} strokeWidth={2} /></View>
+      <T bold style={ui.link}>{visible ? 'Verberg betalingen' : 'Toon betalingen'}</T>
+    </Pressable>
   </View>;
 }
 
-export function NoticeCard({ notice, onOpen, onDismiss }: { notice: Notice; onOpen: () => void; onDismiss?: () => void }) {
-  const danger = notice.tone === 'danger';
-  return <View style={[styles.notice, danger && styles.dangerNotice]} testID={`notice-${notice.id}`}>
-    <View style={styles.noticeRow}>
-      <View style={styles.noticeSymbol}><Icon name={danger ? 'shield' : 'kate'} size={34} color={danger ? Bank.red : Bank.blue} /></View>
-      <View style={{ flex: 1, gap: 6 }}>
-        <View style={styles.noticeByline}><T bold style={{ fontSize: 11, color: danger ? Bank.red : Bank.navy }}>{danger ? 'Kate beschermt je · code rood' : notice.tone === 'success' ? 'Kate staat aan je zijde' : 'Kate kijkt vooruit'}</T></View>
-        <T bold style={{ fontSize: 16, lineHeight: 21, paddingRight: onDismiss ? 10 : 0 }}>{notice.title}</T>
-        <T style={styles.noticeBody}>{notice.body}</T>
-        {notice.action && <Pressable accessibilityRole="button" onPress={onOpen} style={styles.noticeAction}><T bold style={{ color: danger ? Bank.red : Bank.blueDark, fontSize: 12, flexShrink: 1 }}>{notice.actionLabel}</T><Icon name="arrow" size={16} color={danger ? Bank.red : Bank.blueDark} /></Pressable>}
+export function KateTip({ onDismiss }: { onDismiss: () => void }) {
+  return <Card style={{ marginTop: Space.md }}>
+    <View style={styles.tip}>
+      <View style={{ width: 34, paddingTop: 2 }}><Icon name="hex" size={32} color="#C8CDD2" /></View>
+      <View style={{ flex: 1, paddingRight: 18 }}>
+        <View style={styles.tipHead}><KateMark /><T bold style={{ fontSize: 14.5 }}>Kate tip</T></View>
+        <T style={styles.tipText}>Jouw top 10 Extra diensten altijd binnen handbereik? Stel je favorieten nu in.</T>
       </View>
     </View>
-    {onDismiss && !danger && <View style={styles.dismiss}><IconButton name="close" label={`Sluit tip: ${notice.title}`} onPress={onDismiss} color={Bank.muted} style={{ width: 36, height: 36 }} /></View>}
-  </View>;
+    <Pressable accessibilityRole="button" accessibilityLabel="Sluit Kate tip" onPress={onDismiss} hitSlop={hitSlopFor(22)} style={styles.close}><T style={{ fontSize: 11, color: Color.muted }}>✕</T></Pressable>
+  </Card>;
 }
 
-export function BottomNavigation({ bottom, onOpen, onStart }: { bottom: number; onOpen: (utility: Utility) => void; onStart: () => void }) {
-  const tabs: { label: 'Start' | 'Mijn KBC' | 'Beleggen' | 'Aanbod'; icon: IconName }[] = [{ label: 'Start', icon: 'wallet' }, { label: 'Mijn KBC', icon: 'list' }, { label: 'Beleggen', icon: 'piggy' }, { label: 'Aanbod', icon: 'layers' }];
+export function InUit({ onMore }: { onMore: () => void }) {
+  const maxBar = 100;
+  return <Card>
+    <View style={styles.row}>
+      <T style={{ fontSize: 16 }}>In &amp; uit <T style={{ color: Color.muted, fontSize: 14 }}> {IN_OUT.month}</T></T>
+      <Pressable accessibilityRole="button" accessibilityLabel="Meer opties voor In en uit" onPress={onMore} hitSlop={hitSlopFor(24)}><T style={{ color: Color.muted }}>•••</T></Pressable>
+    </View>
+    <View style={styles.kpis}>
+      <View style={styles.kpi} accessible accessibilityLabel={`Inkomsten ${eurCents(IN_OUT.income)} euro`}>
+        <View style={[styles.square, { backgroundColor: Color.teal }]}><Icon name="coins-plus" color="#10302A" /></View>
+        <View><T style={styles.kpiLabel}>Inkomsten</T><T bold style={{ fontSize: 15 }}>€ {eurCents(IN_OUT.income)}</T></View>
+      </View>
+      <View style={styles.kpi} accessible accessibilityLabel={`Uitgaven ${eurCents(IN_OUT.expenses)} euro`}>
+        <View style={[styles.square, { backgroundColor: Color.yellow }]}><Icon name="coins-minus" color="#231B00" /></View>
+        <View><T style={styles.kpiLabel}>Uitgaven</T><T bold style={{ fontSize: 15 }}>€ {eurCents(IN_OUT.expenses)}</T></View>
+      </View>
+    </View>
+    <View style={[styles.bars, { height: maxBar }]} accessible accessibilityLabel="Staafgrafiek inkomsten en uitgaven van mei tot oktober">
+      {IN_OUT.bars.map(([income, expense], index) => {
+        const current = index === IN_OUT.bars.length - 1;
+        return <View key={IN_OUT.months[index]} style={styles.barPair}>
+          <View style={[styles.bar, { height: income, backgroundColor: current ? Color.teal : '#1E4A42' }]} />
+          <View style={[styles.bar, { height: expense, backgroundColor: current ? Color.yellow : '#5A4D12' }]} />
+        </View>;
+      })}
+    </View>
+    <View style={styles.months}>{IN_OUT.months.map((month, index) => <T key={month} bold={index === IN_OUT.months.length - 1} style={[styles.month, index === IN_OUT.months.length - 1 && { color: Color.text }]}>{month}</T>)}</View>
+  </Card>;
+}
+
+export function GoalCard({ text }: { text: string }) {
+  return <Card>
+    <View style={styles.row}>
+      <T bold style={{ fontSize: 15 }}>✈️  {GOAL.name}</T>
+      <T style={{ color: Color.muted, fontSize: 15 }}>€ {GOAL.saved} van € {GOAL.target}</T>
+    </View>
+    <ProgressBar value={GOAL.saved} max={GOAL.target} label={`Spaardoel ${GOAL.name}: ${GOAL.saved} van ${GOAL.target} euro`} />
+    <T style={{ fontSize: 13.5, color: Color.muted }}>{text}</T>
+  </Card>;
+}
+
+const TABS: { label: string; icon: IconName }[] = [{ label: 'Start', icon: 'wallet-filled' }, { label: 'Mijn KBC', icon: 'list' }, { label: 'Beleggen', icon: 'piggy' }, { label: 'Aanbod', icon: 'layers' }];
+
+export function BottomNavigation({ bottom, onTab, onTransfer }: { bottom: number; onTab: (label: string) => void; onTransfer: () => void }) {
   return <>
-    <Pressable testID="transfer-button" accessibilityRole="button" accessibilityLabel="Overschrijven" onPress={() => onOpen('transfer')} style={({ pressed }) => [styles.transfer, { bottom: bottom + 91 }, pressed && { opacity: 0.8 }]}><Icon name="transfer" size={27} color={Bank.white} /></Pressable>
-    <View style={[styles.bottomNav, { bottom: bottom + 8 }]}>
-      {tabs.map(tab => <Pressable key={tab.label} accessibilityRole="button" accessibilityLabel={tab.label} accessibilityState={{ selected: tab.label === 'Start' }} onPress={() => tab.label === 'Start' ? onStart() : onOpen(tab.label)} style={({ pressed }) => [styles.tab, tab.label === 'Start' && styles.selectedTab, pressed && { opacity: 0.6 }]}><Icon name={tab.icon} size={23} color={tab.label === 'Start' ? Bank.navy : '#3E4650'} /><T bold={tab.label === 'Start'} style={[styles.tabLabel, tab.label !== 'Start' && { color: '#333C45' }]}>{tab.label}</T></Pressable>)}
+    <Pressable testID="transfer-button" accessibilityRole="button" accessibilityLabel="Overschrijven" onPress={onTransfer} style={({ pressed }) => [styles.fab, { bottom: 86 + bottom + 14 }, pressed && ui.pressed]}>
+      <Icon name="swap" size={30} color={Color.onBlue} />
+    </Pressable>
+    <View style={[styles.tabbar, { paddingBottom: bottom }]} accessibilityRole="tablist">
+      {TABS.map(tab => {
+        const selected = tab.label === 'Start';
+        return <Pressable key={tab.label} accessibilityRole="tab" accessibilityLabel={tab.label} accessibilityState={{ selected }} onPress={() => onTab(tab.label)} style={({ pressed }) => [styles.tab, pressed && ui.pressed]}>
+          <Icon name={tab.icon} size={26} color={selected ? '#FFFFFF' : Color.tab} />
+          <T style={[styles.tabLabel, selected && { color: '#FFFFFF' }]}>{tab.label}</T>
+        </Pressable>;
+      })}
     </View>
   </>;
 }
 
 const styles = StyleSheet.create({
-  header: { flexDirection: 'row', alignItems: 'center', gap: 9, paddingHorizontal: 16, paddingTop: 13, paddingBottom: 22 },
-  roundButton: { backgroundColor: Bank.white, boxShadow: '0 5px 22px rgba(27, 55, 76, .07)' },
-  kateSearch: { flex: 1, minWidth: 0, minHeight: 42, borderWidth: 1.3, borderColor: '#C3DCFF', borderRadius: 25, paddingHorizontal: 11, flexDirection: 'row', alignItems: 'center', gap: 7 },
-  searchPlaceholder: { fontSize: 13, color: '#83A2C4', flex: 1 },
-  kateLogo: { flexDirection: 'row', gap: 3, alignItems: 'center' },
-  kateWord: { fontSize: 18, letterSpacing: -0.7 },
-  notificationDot: { position: 'absolute', right: 7, top: 8, width: 10, height: 10, borderRadius: 6, backgroundColor: '#ED5857', borderWidth: 1.5, borderColor: 'white' },
-  categories: { paddingHorizontal: 16, gap: 8, alignItems: 'center' },
-  activeCategory: { width: 44, height: 40, borderRadius: 24, alignItems: 'center', justifyContent: 'center', backgroundColor: Bank.navy },
-  category: { minHeight: 40, paddingHorizontal: 13, flexDirection: 'row', alignItems: 'center', gap: 7, borderRadius: 24, backgroundColor: Bank.pale },
-  categoryLabel: { color: '#4F729A', fontSize: 14 },
-  accountsSection: { marginTop: 17 },
-  sectionHeading: { marginHorizontal: 18, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 3 },
-  heading: { fontSize: 20, lineHeight: 27, letterSpacing: -0.4 },
-  accounts: { paddingHorizontal: 16, paddingBottom: 20, gap: 11 },
-  account: { width: 144, backgroundColor: Bank.white, borderRadius: 13, overflow: 'hidden', ...cardShadow },
-  accountArt: { height: 93, alignItems: 'center', justifyContent: 'center' },
-  accountContent: { padding: 11, paddingBottom: 8, gap: 3 },
-  accountOwner: { color: '#557799', fontSize: 10, lineHeight: 15 },
-  accountBalance: { fontSize: 18, lineHeight: 25, letterSpacing: -0.3 },
-  accountLabel: { color: Bank.muted, fontSize: 9, lineHeight: 16 },
-  accountIndicator: { height: 3, marginHorizontal: 11, borderRadius: 3, marginBottom: 9, backgroundColor: 'transparent' },
-  transactions: { marginHorizontal: 22, marginTop: -4 },
-  transaction: { minHeight: 36, flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 6 },
-  transactionDate: { color: '#8096AA', fontSize: 10, width: 33 },
-  merchant: { fontSize: 13, lineHeight: 18 },
-  transactionAmount: { fontSize: 13, lineHeight: 20 },
-  togglePayments: { flexDirection: 'row', gap: 12, alignItems: 'center', minHeight: 46, alignSelf: 'flex-start', marginTop: 6 },
-  notice: { backgroundColor: Bank.white, borderRadius: 17, padding: 17, ...cardShadow, borderWidth: 1, borderColor: '#F1F5F8' },
-  dangerNotice: { backgroundColor: '#FFF8F8', borderColor: '#F4D5D8' },
-  noticeRow: { flexDirection: 'row', gap: 12 },
-  noticeSymbol: { paddingTop: 1 },
-  noticeByline: { minHeight: 19, paddingRight: 15 },
-  noticeBody: { fontSize: 13, lineHeight: 20, color: '#51708F' },
-  noticeAction: { minHeight: 36, flexDirection: 'row', alignItems: 'center', gap: 7, alignSelf: 'flex-start', paddingTop: 4 },
-  dismiss: { position: 'absolute', right: 4, top: 4 },
-  transfer: { position: 'absolute', right: 23, width: 55, height: 55, borderRadius: 30, backgroundColor: Bank.blue, alignItems: 'center', justifyContent: 'center', boxShadow: '0 7px 20px rgba(0, 142, 196, .22)', zIndex: 5 },
-  bottomNav: { position: 'absolute', left: 16, right: 16, padding: 5, flexDirection: 'row', height: 70, backgroundColor: '#FFFFFFF5', borderWidth: 1, borderColor: '#FFFFFF', borderRadius: 38, boxShadow: '0 4px 34px rgba(35, 61, 79, .13)', zIndex: 6 },
-  tab: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: 2, borderRadius: 30 },
-  selectedTab: { backgroundColor: '#EEF1F4' },
-  tabLabel: { fontSize: 11, lineHeight: 17 },
+  top: { flexDirection: 'row', alignItems: 'center', gap: 2, paddingHorizontal: 9, paddingTop: 6, paddingBottom: 4 },
+  topButton: { width: Touch, height: Touch },
+  search: { flex: 1, minWidth: 0, height: 40, borderRadius: 20, backgroundColor: Color.field, borderWidth: 1, borderColor: Color.fieldLine, flexDirection: 'row', alignItems: 'center', gap: 8, paddingHorizontal: 12 },
+  searchText: { color: Color.muted, fontSize: 15, flex: 1 },
+  kate: { flexDirection: 'row', alignItems: 'center', gap: 4 },
+  bellDot: { position: 'absolute', top: 9, right: 10, width: 9, height: 9, borderRadius: 5, backgroundColor: Color.red },
+  chips: { gap: Space.sm, paddingHorizontal: Space.lg, paddingTop: 6, paddingBottom: 10 },
+  chip: { height: 32, borderRadius: 16, backgroundColor: Color.chip, flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 12 },
+  chipSelected: { backgroundColor: Color.chipSelected },
+  chipText: { fontSize: 14, color: Color.chipText },
+  accounts: { gap: 10, paddingHorizontal: Space.lg, paddingTop: 6 },
+  account: { width: 128, borderRadius: Radius.md, backgroundColor: Color.card, overflow: 'hidden' },
+  accountArt: { height: 92 },
+  accountName: { fontSize: 13, color: Color.muted, paddingHorizontal: 10, paddingTop: 10, paddingBottom: 2, textTransform: 'uppercase', letterSpacing: 0.2 },
+  accountBalance: { fontSize: 15, paddingHorizontal: 10, paddingBottom: 12 },
+  accountSelected: { position: 'absolute', left: 0, right: 0, bottom: 0, height: 3, backgroundColor: Color.text },
+  accountSmall: { width: 112, justifyContent: 'center', padding: Space.sm, gap: Space.xs },
+  smallAction: { minHeight: Touch, justifyContent: 'center', gap: 2, paddingHorizontal: 4 },
+  smallText: { fontSize: 14, color: Color.muted },
+  tx: { paddingHorizontal: Space.lg, paddingTop: Space.md, paddingBottom: Space.xs },
+  txRow: { flexDirection: 'row', gap: 14, paddingVertical: 5, alignItems: 'baseline' },
+  txDate: { color: Color.muted, width: 40, fontSize: 13 },
+  txName: { fontSize: 15, flex: 1 },
+  txAmount: { fontSize: 15 },
+  txToggle: { flexDirection: 'row', alignItems: 'center', gap: 10, minHeight: Touch, alignSelf: 'flex-start' },
+  tip: { flexDirection: 'row', gap: 14 },
+  tipHead: { flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 4 },
+  tipText: { fontSize: 15, lineHeight: 23 },
+  close: { position: 'absolute', top: 12, right: 12, width: 22, height: 22, borderRadius: 11, backgroundColor: Color.closeChip, alignItems: 'center', justifyContent: 'center' },
+  row: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
+  kpis: { flexDirection: 'row', gap: 30, marginVertical: 14 },
+  kpi: { flexDirection: 'row', gap: 10, alignItems: 'center' },
+  square: { width: 40, height: 40, borderRadius: 9, alignItems: 'center', justifyContent: 'center' },
+  kpiLabel: { color: Color.muted, fontSize: 14 },
+  bars: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end', borderBottomWidth: 1, borderBottomColor: Color.line, paddingHorizontal: 12 },
+  barPair: { flexDirection: 'row', gap: 3, alignItems: 'flex-end' },
+  bar: { width: 7, borderTopLeftRadius: 4, borderTopRightRadius: 4 },
+  months: { flexDirection: 'row', justifyContent: 'space-between', paddingTop: 8, paddingHorizontal: 6 },
+  month: { fontSize: 13, color: Color.muted },
+  fab: { position: 'absolute', right: Space.lg, width: 56, height: 56, borderRadius: 28, backgroundColor: Color.blue, alignItems: 'center', justifyContent: 'center', boxShadow: '0 6px 18px rgba(0,0,0,.4)', zIndex: 5 },
+  tabbar: { position: 'absolute', left: 0, right: 0, bottom: 0, minHeight: 64, backgroundColor: Color.tabBar, borderTopWidth: 1, borderTopColor: Color.tabLine, flexDirection: 'row', justifyContent: 'space-around', paddingTop: Space.sm },
+  tab: { alignItems: 'center', gap: 4, width: 76, minHeight: Touch },
+  tabLabel: { fontSize: 12, color: Color.tab },
 });

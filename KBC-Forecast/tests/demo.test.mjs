@@ -1,98 +1,50 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 
-import { createSnapshot, demoDate, getSnapshot, initialChoices, PERSONAS } from '../src/data/demo.ts';
+import { BALANCE, DAYS, dayText, eur, forecast, goalText, GSM_DAY, headline, initialChoices, spendOn } from '../src/data/demo.ts';
 
-const request = (personaId, choices = {}, step = 0) => ({ personaId, step, choices: { ...initialChoices(), ...choices } });
+const choose = patch => ({ ...initialChoices(), ...patch });
 
-test('every persona has fourteen consecutive days and consistent current balances', () => {
-  for (const { id } of PERSONAS) {
-    for (const step of [0, 1]) {
-      const snapshot = createSnapshot(request(id, {}, step));
-      assert.equal(snapshot.forecast.length, 14);
-      assert.equal(snapshot.today, snapshot.forecast[0].date);
-      assert.equal(snapshot.accounts[0].balance, snapshot.forecast[0].balance);
-      for (let index = 1; index < snapshot.forecast.length; index++) {
-        assert.equal(Date.parse(snapshot.forecast[index].date) - Date.parse(snapshot.forecast[index - 1].date), 86400000);
-        assert.ok(Number.isFinite(snapshot.forecast[index].balance));
-      }
-    }
-  }
+test('baseline month is sunny with rain on 6 and 7 October', () => {
+  const choices = initialChoices();
+  const model = forecast(choices);
+  assert.equal(model.path.length, DAYS + 1);
+  assert.equal(model.path[0], BALANCE);
+  assert.equal(eur(model.perDay), '€ 24');
+  assert.equal(model.redDay, -1);
+  assert.deepEqual(model.weather.slice(0, 7), ['sun', 'sun', 'sun', 'sun', 'rain', 'rain', 'sun']);
+  assert.equal(headline(model, choices), 'Een zonnige maand, met wat regen op 6 en 7 oktober.');
 });
 
-test('Lotte’s what-if affects Friday onwards without spending current money', () => {
-  const baseline = createSnapshot(request('lotte'));
-  const scenario = createSnapshot(request('lotte', { nightOut: true }));
-  assert.deepEqual(scenario.accounts, baseline.accounts);
-  assert.deepEqual(scenario.transactions, baseline.transactions);
-  for (let index = 0; index < 14; index++) {
-    assert.equal(scenario.forecast[index].balance, Math.round((baseline.forecast[index].balance - (index >= 4 ? 60 : 0)) * 100) / 100);
-  }
-  assert.deepEqual(scenario.forecast.slice(4, 7).map(day => day.weather), ['thunder', 'cloud', 'sun']);
-  assert.deepEqual(createSnapshot(request('lotte')), baseline);
+test('going out tonight: thunder, then clouds, then clearing up', () => {
+  const choices = choose({ uitgaan: true });
+  const model = forecast(choices);
+  assert.deepEqual(model.weather.slice(0, 3), ['thunder', 'cloud', 'rainbow']);
+  assert.equal(Math.round(model.perDay) - Math.round(forecast(initialChoices()).perDay), -2);
+  assert.match(headline(model, choices), /na regen komt zonneschijn/);
+  assert.equal(dayText(model, 1).title, 'Zaterdag 3/10 · Bewolkt');
 });
 
-test('advancing to Saturday records the night out once and keeps its recovery story', () => {
-  const scenario = request('lotte', { nightOut: true }, 1);
-  const saturday = createSnapshot(scenario);
-  assert.equal(saturday.today, demoDate(5));
-  assert.equal(saturday.transactions.filter(item => item.id === 'night-out').length, 1);
-  assert.equal(saturday.forecast[0].weather, 'cloud');
-  assert.equal(saturday.forecast[1].weather, 'sun');
-  assert.equal(saturday.notices[0].id, 'recovery');
-  assert.equal(saturday.accounts[0].balance, createSnapshot(request('lotte', { nightOut: true })).forecast[5].balance);
-  assert.deepEqual(createSnapshot(scenario), saturday);
+test('buying the phone turns Saturday 10/10 into a storm and the month red', () => {
+  const choices = choose({ gsm: true });
+  const model = forecast(choices);
+  assert.equal(model.weather[GSM_DAY], 'storm');
+  assert.ok(model.low < 0);
+  assert.ok(model.redDay > GSM_DAY);
+  assert.match(headline(model, choices), /^Storm op zaterdag 10\/10/);
+  assert.equal(spendOn(model.events[GSM_DAY]), 299);
 });
 
-test('Peeters confirms the life event before receiving its playbook', () => {
-  const pending = createSnapshot(request('peeters', {}, 1));
-  assert.equal(pending.accounts[0].balance, 1990);
-  assert.equal(pending.season, undefined);
-  assert.equal(pending.notices[0].action, 'moment');
-  assert.ok(!pending.notices.some(notice => notice.action === 'policy'));
-  const confirmed = createSnapshot(request('peeters', { kotResponse: 'confirmed' }, 1));
-  assert.equal(confirmed.season, 'Kind op kot');
-  assert.ok(confirmed.notices.some(notice => notice.action === 'policy'));
-  const dismissed = createSnapshot(request('peeters', { kotResponse: 'dismissed' }, 1));
-  assert.equal(dismissed.season, undefined);
-  assert.ok(!dismissed.notices.some(notice => ['buffer', 'policy'].includes(notice.action)));
-  assert.deepEqual(dismissed.forecast, pending.forecast);
+test('savings are not spending and drive the goal date', () => {
+  const withSaving = forecast(initialChoices());
+  const without = forecast(choose({ sparen: false }));
+  assert.equal(spendOn(withSaving.events[7]), 0);
+  assert.ok(without.perDay > withSaving.perDay);
+  assert.equal(goalText(withSaving), 'Met € 25 per week haal je het rond december.');
+  assert.equal(goalText(without), 'Zonder vaste spaarbooster haal je het niet voor de zomer.');
 });
 
-test('the temporary buffer is repaid when salary arrives; policy cancellation removes one charge', () => {
-  const baseline = createSnapshot(request('peeters', { kotResponse: 'confirmed' }, 1));
-  const buffered = createSnapshot(request('peeters', { kotResponse: 'confirmed', bufferAccepted: true }, 1));
-  assert.equal(buffered.accounts[0].balance - baseline.accounts[0].balance, 500);
-  assert.equal(buffered.forecast.find(day => day.dayIndex === 3).weather, 'rain');
-  for (const day of buffered.forecast.filter(day => day.dayIndex >= 6)) {
-    assert.equal(day.balance, baseline.forecast.find(item => item.date === day.date).balance);
-  }
-  const cancelled = createSnapshot(request('peeters', { kotResponse: 'confirmed', policyCancelled: true }, 1));
-  assert.equal(cancelled.accounts[0].balance, baseline.accounts[0].balance);
-  assert.equal(cancelled.forecast.find(day => day.dayIndex === 4).balance - baseline.forecast.find(day => day.dayIndex === 4).balance, 14);
-  assert.ok(!cancelled.forecast.flatMap(day => day.signals).some(signal => signal.label === 'Extra KBC-polis'));
-});
-
-test('a held or cancelled fraudulent transfer never reduces Jos’s money', () => {
-  const normal = createSnapshot(request('jos'));
-  const held = createSnapshot(request('jos', {}, 1));
-  const cancelled = createSnapshot(request('jos', { paymentCancelled: true, helpRequested: true }, 1));
-  assert.equal(held.accounts[0].balance, normal.accounts[0].balance);
-  assert.deepEqual(held.accounts, cancelled.accounts);
-  assert.deepEqual(held.forecast, cancelled.forecast);
-  assert.equal(held.transactions[0].status, 'held');
-  assert.equal(cancelled.transactions[0].status, 'cancelled');
-  assert.ok(!cancelled.notices.some(notice => notice.tone === 'danger'));
-});
-
-test('service responses are isolated from the request and other persona sessions', async () => {
-  const input = request('lotte', { nightOut: true });
-  const expected = structuredClone(input);
-  const first = await getSnapshot(input);
-  first.choices.nightOut = false;
-  first.accounts[0].balance = 0;
-  await getSnapshot(request('peeters', { bufferAccepted: true, kotResponse: 'confirmed' }, 1));
-  assert.deepEqual(input, expected);
-  assert.deepEqual(await getSnapshot(input), createSnapshot(expected));
-  assert.deepEqual(await getSnapshot(request('lotte')), createSnapshot(request('lotte')));
+test('euro formatting matches the mockup', () => {
+  assert.equal(eur(1120), '€ 1.120');
+  assert.equal(eur(-68.6), '€ -69');
 });
