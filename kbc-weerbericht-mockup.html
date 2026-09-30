@@ -1,0 +1,626 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>KBC Weerbericht – conceptmockup</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:opsz,wght@6..12,300;6..12,400;6..12,600;6..12,700;6..12,800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#111315; --card:#1E2022; --card2:#26292C; --line:#2C3034;
+  --text:#F2F4F5; --muted:#A3AAB1; --dim:#6F777F;
+  --blue:#1A9FE4; --blue-dark:#0D2A50; --green:#5BA215; --teal:#0E9E83;
+  --yellow:#E9C100; --orange:#F69D14; --red:#D64040; --rain:#74C8ED;
+  --chip:#1D2A33;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{background:#05080B;color:var(--text);font-family:"Nunito Sans",-apple-system,"Segoe UI",sans-serif;font-weight:400;display:flex;align-items:center;justify-content:center;gap:40px;min-height:100vh;overflow:hidden}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+
+/* presenter panel */
+.panel{width:260px;display:flex;flex-direction:column;gap:10px}
+.panel h1{font-size:20px;font-weight:800;line-height:1.2}
+.panel p{font-size:13px;color:var(--muted);line-height:1.5}
+.panel .scene{display:flex;gap:10px;align-items:center;text-align:left;padding:10px 12px;border-radius:10px;background:#12171C;border:1px solid #1E262E;font-size:14px}
+.panel .scene b{display:inline-grid;place-items:center;width:24px;height:24px;border-radius:50%;background:#1E262E;font-size:12px;flex:none}
+.panel .scene.on{border-color:var(--blue);background:#0E2231}
+.panel .scene.on b{background:var(--blue);color:#051018}
+.panel .scene span small{display:block;color:var(--muted);font-size:12px}
+.disclaimer{font-size:11.5px;color:var(--dim);line-height:1.4;margin-top:6px}
+
+/* phone */
+.stage{transform-origin:center center}
+.phone{width:390px;height:844px;border-radius:54px;background:var(--bg);position:relative;overflow:hidden;box-shadow:0 0 0 10px #1a1d20,0 0 0 11px #2a2e33,0 30px 80px rgba(0,0,0,.6)}
+.screen{position:absolute;inset:0;display:none;flex-direction:column}
+.screen.on{display:flex}
+.status{height:50px;flex:none;display:flex;align-items:flex-end;justify-content:space-between;padding:0 30px 6px 46px;font-weight:700;font-size:16px}
+.status .r{display:flex;gap:6px;align-items:center;font-size:14px}
+.scroll{flex:1;overflow-y:auto;overflow-x:hidden;padding-bottom:100px;scrollbar-width:none}
+.scroll::-webkit-scrollbar{display:none}
+
+/* top bar */
+.top{display:flex;align-items:center;gap:10px;padding:10px 16px 8px}
+.iconbtn{width:30px;height:30px;display:grid;place-items:center;color:var(--text)}
+.search{flex:1;height:40px;border-radius:20px;background:#1A1C1E;border:1px solid #2A2D30;display:flex;align-items:center;gap:8px;padding:0 12px;color:var(--muted);font-size:15px}
+.search .kate{margin-left:auto}
+.kate{display:inline-flex;align-items:center;gap:4px;font-weight:800;color:var(--text);font-size:15px}
+.klogo{width:16px;height:16px;border-radius:50%;background:#E6F6FF;display:inline-grid;place-items:center;flex:none}
+.bell{position:relative;color:var(--blue)}
+.bell::after{content:"";position:absolute;top:1px;right:2px;width:9px;height:9px;border-radius:50%;background:var(--red)}
+
+.chips{display:flex;gap:8px;padding:6px 16px 10px;overflow:hidden}
+.chip{height:32px;border-radius:16px;background:var(--chip);display:flex;align-items:center;gap:6px;padding:0 12px;font-size:14px;color:#C9D1D9;white-space:nowrap}
+.chip.sel{background:#E9E9E9;color:#111;padding:0 12px}
+
+/* accounts */
+.accts{display:flex;gap:10px;padding:6px 16px 0;overflow:hidden}
+.acct{width:128px;flex:none;border-radius:10px;background:var(--card);overflow:hidden}
+.acct .img{height:92px}
+.acct .nm{font-size:13px;color:var(--muted);padding:10px 10px 2px;text-transform:uppercase;letter-spacing:.2px}
+.acct .bal{font-size:15px;font-weight:700;padding:0 10px 12px}
+.acct.sel{box-shadow:inset 0 -3px 0 var(--text)}
+.acct.small{width:112px;background:var(--card);display:flex;flex-direction:column;gap:8px;justify-content:center;padding:12px;font-size:14px;color:var(--muted)}
+.tx{padding:12px 16px 4px}
+.tx div{display:flex;gap:14px;font-size:15px;padding:5px 0}
+.tx .d{color:var(--muted);width:40px;font-size:13px;padding-top:2px}
+.tx .a{margin-left:auto;font-weight:600}
+.tx .a.p{color:#7ED957}
+.link{color:var(--blue);font-weight:700;font-size:14px}
+
+/* sections */
+.sec{padding:22px 16px 0}
+.sechead{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:12px}
+.sechead h2{font-size:18px;font-weight:400}
+.card{background:var(--card);border-radius:10px;padding:16px;position:relative}
+.card + .card{margin-top:12px}
+.x{position:absolute;top:12px;right:12px;width:22px;height:22px;border-radius:50%;background:#2A3238;display:grid;place-items:center;font-size:11px;color:var(--muted)}
+.tip{display:flex;gap:14px}
+.tip .ic{width:34px;flex:none;color:#C8CDD2;padding-top:2px}
+.tip .t{font-size:15px;line-height:1.55}
+.tiph{display:flex;align-items:center;gap:6px;font-weight:700;font-size:14.5px;margin-bottom:4px}
+.dot{position:absolute;left:-6px;top:-4px;width:9px;height:9px;border-radius:50%;background:var(--red)}
+
+/* weather card (Start) */
+.wx{cursor:pointer;background:linear-gradient(160deg,#1C2B38 0%,#1E2022 55%);border:1px solid #243644}
+.wxtop{display:flex;align-items:center;gap:6px;font-weight:700;font-size:14.5px}
+.wxtop .new{margin-left:auto;font-size:11.5px;font-weight:700;background:var(--teal);color:#fff;border-radius:6px;padding:2px 7px}
+.wxnow{display:flex;align-items:center;gap:14px;margin:12px 0 6px}
+.wxnow .temp{font-size:40px;font-weight:800;line-height:1;letter-spacing:-1px}
+.wxnow .sub{font-size:13px;color:var(--muted);line-height:1.35}
+.wxnow .lbl{margin-left:auto;text-align:right;font-size:14px;font-weight:700}
+.wxnow .lbl small{display:block;font-weight:400;color:var(--muted);font-size:12.5px}
+.wxhead{font-size:15px;line-height:1.45;margin:6px 0 12px}
+.week{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;text-align:center;border-top:1px solid var(--line);padding-top:12px}
+.week .dn{font-size:12px;color:var(--muted);margin-bottom:4px}
+.week .dn.today{color:var(--text);font-weight:700}
+.week .amt{font-size:11px;color:var(--muted);margin-top:2px;min-height:14px}
+.pill{display:inline-flex;align-items:center;justify-content:center;gap:6px;height:38px;padding:0 18px;border-radius:19px;border:1.5px solid var(--blue);color:var(--blue);font-size:16px;font-weight:600}
+.pill.fill{background:var(--blue);color:#06131C;border-color:var(--blue)}
+.pill.sm{height:34px;font-size:14.5px;padding:0 14px}
+.wxbtns{display:flex;gap:10px;margin-top:14px}
+
+/* In & uit */
+.inuit .row{display:flex;gap:30px;margin:14px 0}
+.inuit .kpi{display:flex;gap:10px;align-items:center}
+.inuit .sq{width:40px;height:40px;border-radius:9px;display:grid;place-items:center}
+.inuit .kpi small{color:var(--muted);font-size:14px;display:block}
+.inuit .kpi b{font-size:15px}
+.bars{display:flex;justify-content:space-between;align-items:flex-end;height:100px;border-bottom:1px solid var(--line);padding:0 12px}
+.bars .m{display:flex;gap:3px;align-items:flex-end}
+.bars i{display:block;width:7px;border-radius:4px 4px 0 0}
+.months{display:flex;justify-content:space-between;padding:8px 6px 0;font-size:13px;color:var(--muted)}
+
+/* tab bar */
+.tabbar{position:absolute;left:0;right:0;bottom:0;height:86px;background:#141618;border-top:1px solid #1C1F22;display:flex;justify-content:space-around;padding-top:8px}
+.tab{display:flex;flex-direction:column;align-items:center;gap:4px;font-size:12px;color:#9AA0A6;width:70px}
+.tab.on{color:#fff}
+.home{position:absolute;bottom:8px;left:50%;transform:translateX(-50%);width:134px;height:5px;border-radius:3px;background:#fff}
+.fab{position:absolute;right:16px;bottom:100px;width:56px;height:56px;border-radius:50%;background:var(--blue);display:grid;place-items:center;color:#06131C;box-shadow:0 6px 18px rgba(0,0,0,.4);z-index:5}
+
+/* sub header */
+.subhead{display:flex;align-items:center;justify-content:space-between;padding:10px 16px 12px}
+.subhead h3{font-size:17px;font-weight:600}
+.subhead .iconbtn{color:var(--blue)}
+
+/* detail */
+.hero{padding:6px 16px 0}
+.hero .big{display:flex;gap:16px;align-items:center}
+.hero h2{font-size:22px;font-weight:800;line-height:1.25}
+.hero p{color:var(--muted);font-size:14.5px;line-height:1.5;margin-top:8px}
+.temp2{display:flex;align-items:baseline;gap:8px;margin-top:10px}
+.temp2 b{font-size:34px;font-weight:800;letter-spacing:-1px}
+.temp2 span{color:var(--muted);font-size:14px}
+.temp2 .delta{font-size:13px;font-weight:700;border-radius:6px;padding:2px 7px}
+.strip{display:flex;gap:8px;overflow-x:auto;padding:14px 16px 4px;scrollbar-width:none}
+.strip::-webkit-scrollbar{display:none}
+.day{flex:none;width:62px;border-radius:10px;background:var(--card);padding:10px 4px 8px;text-align:center;cursor:pointer;border:1.5px solid transparent}
+.day.sel{border-color:var(--blue)}
+.day .dn{font-size:12px;color:var(--muted)}
+.day .dd{font-size:13px;font-weight:700;margin-bottom:6px}
+.day .ev{font-size:11px;color:var(--muted);margin-top:4px;min-height:14px;white-space:nowrap}
+.dayinfo{margin:10px 16px 0;background:var(--card);border-radius:10px;padding:14px 16px;font-size:14.5px;line-height:1.5}
+.dayinfo b{display:block;font-size:15px;margin-bottom:2px}
+.dayinfo ul{margin-top:6px;padding-left:18px;color:var(--muted);font-size:13.5px}
+.chart{padding:0 16px}
+.chart svg{display:block;width:100%}
+.legend{display:flex;justify-content:space-between;font-size:12px;color:var(--muted);margin-top:4px}
+.toggle{display:flex;align-items:center;gap:12px;padding:12px 0;border-top:1px solid var(--line)}
+.toggle:first-of-type{border-top:0}
+.toggle .tx2{flex:1;font-size:15px;line-height:1.35}
+.toggle .tx2 small{display:block;color:var(--muted);font-size:13px}
+.sw{width:50px;height:30px;border-radius:15px;background:#3A3F44;position:relative;flex:none;transition:.2s}
+.sw::after{content:"";position:absolute;top:3px;left:3px;width:24px;height:24px;border-radius:50%;background:#fff;transition:.2s}
+.sw.on{background:var(--blue)}
+.sw.on::after{left:23px}
+.emoji{width:34px;height:34px;border-radius:9px;background:#2A2D30;display:grid;place-items:center;font-size:17px;flex:none}
+.goal .bar{height:8px;border-radius:4px;background:#2E3337;margin:10px 0 8px;overflow:hidden}
+.goal .bar i{display:block;height:100%;background:var(--green);border-radius:4px;transition:width .4s}
+.why{font-size:14px;color:var(--muted);line-height:1.5}
+.why li{margin:4px 0 0 18px}
+.warn{margin:12px 16px 0;border-radius:10px;padding:12px 14px;background:#3A1718;border:1px solid #6B2626;font-size:14px;line-height:1.45;display:none}
+.warn.on{display:block}
+.fine{font-size:12.5px;color:var(--dim);padding:14px 16px 0;line-height:1.45}
+
+/* lock screen */
+.lock{background:radial-gradient(120% 80% at 50% 0%,#20507A 0%,#0E2238 45%,#070D14 100%)}
+.lock .clock{text-align:center;margin-top:34px}
+.lock .clock .dte{font-size:19px;font-weight:600;color:#DDE7F0}
+.lock .clock .tm{font-size:92px;font-weight:300;line-height:1.05;letter-spacing:-2px}
+.notif{margin:auto 12px 150px;border-radius:22px;background:rgba(40,52,64,.72);backdrop-filter:blur(20px);padding:14px 16px;display:flex;gap:12px;cursor:pointer;animation:slide .6s ease-out both .3s}
+@keyframes slide{from{transform:translateY(30px);opacity:0}to{transform:none;opacity:1}}
+.notif .appic{width:38px;height:38px;border-radius:9px;background:linear-gradient(145deg,#1FA6EA,#0B6FB0);display:grid;place-items:center;flex:none}
+.notif .h{display:flex;justify-content:space-between;font-size:14px;font-weight:700}
+.notif .h span{font-weight:400;color:#C3CDD6;font-size:13px}
+.notif .b{font-size:14.5px;line-height:1.4;margin-top:2px;color:#EEF3F7}
+.lockhint{position:absolute;bottom:40px;width:100%;text-align:center;font-size:13px;color:#9FB3C6}
+
+/* chat */
+.chatwrap{flex:1;overflow-y:auto;padding:0 16px 16px;scrollbar-width:none}
+.chatwrap::-webkit-scrollbar{display:none}
+.chatday{text-align:center;font-size:14px;margin-top:12px}
+.chatai{text-align:center;color:var(--blue);font-size:14px;margin:4px 0 18px}
+.msg{font-size:16px;line-height:1.55;margin:8px 0}
+.kav{width:30px;height:30px;border-radius:50%;background:#E6F6FF;display:grid;place-items:center;margin:14px 0 6px}
+.umsg{margin:14px 0 6px auto;max-width:78%;background:#23313D;border-radius:16px 16px 4px 16px;padding:10px 14px;font-size:15.5px;line-height:1.45;width:fit-content}
+.mini{background:var(--card);border-radius:12px;padding:14px;margin:10px 0}
+.mini .mw{display:grid;grid-template-columns:repeat(5,1fr);text-align:center;gap:4px;margin-top:10px}
+.mini .mw small{display:block;font-size:12px;color:var(--muted)}
+.mini .mw em{display:block;font-style:normal;font-size:11.5px;color:var(--muted);margin-top:2px}
+.pills{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}
+.input{margin:0 16px 30px;height:50px;border-radius:25px;border:1px solid #3A3F44;display:flex;align-items:center;padding:0 5px 0 18px;color:var(--muted);font-size:16px}
+.input .mic{margin-left:auto;width:42px;height:42px;border-radius:50%;background:var(--blue);display:grid;place-items:center;color:#06131C}
+.typing span{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--muted);margin-right:4px;animation:blink 1s infinite}
+.typing span:nth-child(2){animation-delay:.2s}.typing span:nth-child(3){animation-delay:.4s}
+@keyframes blink{50%{opacity:.25}}
+.appear{animation:up .45s ease-out both}
+@keyframes up{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+
+/* code rood */
+.alertband{margin:4px 16px 0;border-radius:12px;background:linear-gradient(150deg,#5A1416,#2B0D0E);border:1px solid #8C2A2A;padding:16px}
+.alertband .h{display:flex;align-items:center;gap:10px;font-weight:800;font-size:13px;letter-spacing:.6px;text-transform:uppercase;color:#FFB4B0}
+.alertband h2{font-size:21px;line-height:1.3;margin-top:10px;font-weight:800}
+.alertband p{font-size:14.5px;color:#F1D2D0;margin-top:6px;line-height:1.5}
+.kv{display:flex;justify-content:space-between;gap:10px;padding:10px 0;border-top:1px solid var(--line);font-size:14.5px}
+.kv:first-child{border-top:0}
+.kv span{color:var(--muted)}
+.kv b{text-align:right;font-weight:600}
+.shield{display:flex;gap:10px;align-items:flex-start;background:#3A2A12;border:1px solid #7A5310;border-radius:10px;padding:10px 12px;font-size:14px;line-height:1.45;margin-top:10px}
+.sig{display:flex;gap:10px;font-size:14.5px;line-height:1.45;padding:7px 0}
+.sig i{width:8px;height:8px;border-radius:50%;background:var(--red);flex:none;margin-top:7px}
+.angel{display:flex;gap:12px;align-items:center}
+.avatar{width:40px;height:40px;border-radius:50%;background:linear-gradient(145deg,#F6B1BD,#EE7079);display:grid;place-items:center;font-weight:800;color:#3B1117;flex:none}
+.stack{display:flex;flex-direction:column;gap:10px;padding:16px}
+.stack .pill{height:46px;font-size:16px}
+.textbtn{color:var(--muted);font-size:14px;text-align:center;text-decoration:underline;padding:6px}
+
+.sheet{position:absolute;inset:0;background:rgba(0,0,0,.55);display:none;align-items:flex-end;z-index:20}
+.sheet.on{display:flex}
+.sheet .in{background:#1A1C1E;border-radius:20px 20px 0 0;padding:18px 18px 40px;width:100%;animation:up .3s ease-out}
+.sheet .grab{width:40px;height:5px;border-radius:3px;background:#3A3F44;margin:0 auto 14px}
+.sheet h4{font-size:18px;margin-bottom:8px}
+
+@media (max-width:760px){
+  body{flex-direction:column;gap:14px;overflow:auto;padding:16px 0}
+  .panel{width:calc(100% - 32px);order:2}
+  .panel .list{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+}
+</style>
+</head>
+<body>
+
+<aside class="panel">
+  <h1>KBC Weerbericht</h1>
+  <p>Klikbare conceptmockup. Kies een scène, of druk op 1 tot 5.</p>
+  <div class="list" style="display:flex;flex-direction:column;gap:8px">
+    <button class="scene" data-go="start"><b>1</b><span>Start<small>Lotte, vrijdag 18:05</small></span></button>
+    <button class="scene" data-go="detail"><b>2</b><span>Jij kiest het weer<small>14 dagen + scenario's</small></span></button>
+    <button class="scene" data-go="lock"><b>3</b><span>Zaterdagochtend<small>pushmelding van Kate</small></span></button>
+    <button class="scene" data-go="chat"><b>4</b><span>Na regen komt zonneschijn<small>Kate-chat</small></span></button>
+    <button class="scene" data-go="rood"><b>5</b><span>Code rood<small>Jos, 74</small></span></button>
+  </div>
+  <button class="scene" id="reset" style="justify-content:center;color:var(--muted)">Demo resetten</button>
+  <p class="disclaimer">Conceptmockup voor de KBC-challenge van de Tectonic hackathon. Geen officiële KBC-app. Alle personen en bedragen zijn fictief.</p>
+</aside>
+
+<div class="stage" id="stage">
+<div class="phone" id="phone">
+
+  <!-- ============ 1. START ============ -->
+  <section class="screen" id="s-start">
+    <div class="status"><span>18:05</span><span class="r">5G <svg width="26" height="12" viewBox="0 0 26 12"><rect x=".5" y=".5" width="22" height="11" rx="3" fill="none" stroke="#fff" opacity=".5"/><rect x="2" y="2" width="15" height="8" rx="2" fill="#fff"/></svg></span></div>
+    <div class="top">
+      <span class="iconbtn" data-i="gear"></span>
+      <div class="search" data-go="chat"><span data-i="search"></span>Hoe kan ik je helpen?<span class="kate"><span class="klogo" data-i="kmark"></span>Kate</span></div>
+      <span class="iconbtn bell" data-i="bell"></span>
+    </div>
+    <div class="scroll">
+      <div class="chips">
+        <span class="chip sel" data-i="wallet"></span>
+        <span class="chip"><span data-i="news"></span>MyNWS</span>
+        <span class="chip"><span data-i="house"></span>MyHome</span>
+        <span class="chip"><span data-i="sign"></span>MyMobility</span>
+      </div>
+      <div class="accts">
+        <div class="acct sel"><div class="img" style="background:linear-gradient(135deg,#46ADE0,#0B5E93)"><svg viewBox="0 0 128 92" width="128" height="92"><circle cx="98" cy="22" r="30" fill="#fff" opacity=".12"/><circle cx="24" cy="80" r="40" fill="#fff" opacity=".08"/><text x="14" y="54" fill="#fff" font-size="22" font-weight="800" font-family="Nunito Sans">Lotte</text></svg></div><div class="nm">Zichtrekening</div><div class="bal">€ 1.120,00</div></div>
+        <div class="acct"><div class="img" style="background:linear-gradient(160deg,#F69D14,#EE7079 55%,#7C45B6)"><svg viewBox="0 0 128 92" width="128" height="92"><circle cx="64" cy="70" r="26" fill="#FFD66B"/><rect y="68" width="128" height="24" fill="#2B2350" opacity=".7"/></svg></div><div class="nm">Lissabon</div><div class="bal">€ 340,00</div></div>
+        <div class="acct small"><span data-i="star"></span>Wijzig favorieten<span style="color:var(--green)" data-i="plus"></span>Nieuw</div>
+      </div>
+      <div class="tx">
+        <div><span class="d">02/10</span>Delhaize Gent<span class="a">- 23,40</span></div>
+        <div><span class="d">01/10</span>Huur oktober<span class="a">- 650,00</span></div>
+        <div><span class="d">30/09</span>Studio Noord (loon)<span class="a p">+ 2.180,00</span></div>
+        <p style="margin-top:6px"><span class="link">⌃&nbsp;&nbsp;Verberg betalingen</span></p>
+      </div>
+
+      <div class="sec">
+        <div class="sechead"><h2>Voor jou</h2><span class="link">Alle communicatie</span></div>
+        <div class="card wx" data-go="detail">
+          <span class="dot"></span>
+          <div class="wxtop"><span class="klogo" data-i="kmark"></span>Jouw financiële weerbericht<span class="new">Nieuw</span></div>
+          <div class="wxnow">
+            <span id="st-icon"></span>
+            <div><div class="temp" id="st-temp">€25</div><div class="sub">vrij per dag<br>tot je loon op 30/10</div></div>
+            <div class="lbl" id="st-lbl">Zonnig<small>vandaag</small></div>
+          </div>
+          <div class="wxhead" id="st-head"></div>
+          <div class="week" id="st-week"></div>
+          <div class="wxbtns"><span class="pill sm fill">Kies je weer</span><span class="pill sm">14 dagen</span></div>
+        </div>
+        <div class="card"><span class="x">✕</span>
+          <div class="tip"><span class="ic" data-i="hex"></span><div><div class="tiph"><span class="klogo" data-i="kmark"></span>Kate tip</div><div class="t">Jouw top 10 Extra diensten altijd binnen handbereik? Stel je favorieten nu in.</div></div></div>
+        </div>
+      </div>
+
+      <div class="sec">
+        <div class="sechead"><h2>Zicht op je geldzaken</h2><span class="link">Toon alles</span></div>
+        <div class="card inuit">
+          <div style="display:flex;justify-content:space-between"><span style="font-size:16px">In &amp; uit <span style="color:var(--muted);font-size:14px">&nbsp;Oktober</span></span><span style="color:var(--muted)">•••</span></div>
+          <div class="row">
+            <div class="kpi"><span class="sq" style="background:var(--teal)" data-i="coinsplus"></span><div><small>Inkomsten</small><b>€ 0,00</b></div></div>
+            <div class="kpi"><span class="sq" style="background:var(--yellow);color:#231B00" data-i="coinsmin"></span><div><small>Uitgaven</small><b>€ 673,40</b></div></div>
+          </div>
+          <div class="bars" id="bars"></div>
+          <div class="months"><span>Mei</span><span>Jun</span><span>Jul</span><span>Aug</span><span>Sep</span><b style="color:var(--text)">Okt</b></div>
+        </div>
+      </div>
+
+      <div class="sec">
+        <div class="sechead"><h2>Sparen voor je dromen</h2><span class="link">Bekijk meer</span></div>
+        <div class="card goal"><div style="display:flex;justify-content:space-between;font-size:15px"><b>✈️&nbsp; Lissabon</b><span style="color:var(--muted)">€ 340 van € 600</span></div><div class="bar"><i style="width:57%"></i></div><div style="font-size:13.5px;color:var(--muted)" id="st-goal"></div></div>
+      </div>
+      <div style="height:30px"></div>
+    </div>
+    <span class="fab" data-i="swap"></span>
+    <nav class="tabbar"><span class="tab on"><span data-i="walletf"></span>Start</span><span class="tab"><span data-i="list"></span>Mijn KBC</span><span class="tab"><span data-i="piggy"></span>Beleggen</span><span class="tab"><span data-i="layers"></span>Aanbod</span></nav>
+    <span class="home"></span>
+  </section>
+
+  <!-- ============ 2. DETAIL ============ -->
+  <section class="screen" id="s-detail">
+    <div class="status"><span>18:06</span><span class="r">5G</span></div>
+    <div class="subhead"><button class="iconbtn" data-go="start" data-i="back"></button><h3>Jouw weerbericht</h3><button class="iconbtn" data-sheet="why" data-i="info"></button></div>
+    <div class="scroll" style="padding-bottom:40px">
+      <div class="hero">
+        <div class="big"><span id="d-icon"></span><h2 id="d-head"></h2></div>
+        <div class="temp2"><b id="d-temp"></b><span>vrij per dag tot je loon op 30/10</span><span class="delta" id="d-delta"></span></div>
+      </div>
+      <div class="warn" id="d-warn"></div>
+      <div class="strip" id="d-strip"></div>
+      <div class="dayinfo" id="d-info"></div>
+
+      <div class="sec">
+        <div class="sechead"><h2>Kies je weer</h2><span style="font-size:13px;color:var(--muted)">live berekend</span></div>
+        <div class="card" style="padding:4px 16px">
+          <div class="toggle" data-t="uitgaan"><span class="emoji">🎉</span><div class="tx2">Vanavond uitgaan<small>vr 2/10 · ongeveer € 60</small></div><span class="sw"></span></div>
+          <div class="toggle" data-t="gsm"><span class="emoji">📱</span><div class="tx2">Nieuwe gsm kopen<small>za 10/10 · € 299</small></div><span class="sw"></span></div>
+          <div class="toggle" data-t="sparen"><span class="emoji">✈️</span><div class="tx2">Elke vrijdag € 25 naar Lissabon<small>vanaf vr 9/10</small></div><span class="sw"></span></div>
+        </div>
+      </div>
+
+      <div class="sec">
+        <div class="sechead"><h2>Je rekening tot je loon</h2></div>
+        <div class="card chart" style="padding:14px 12px 10px"><svg id="d-chart" viewBox="0 0 330 150"></svg><div class="legend"><span>vandaag</span><span>loon 30/10</span></div></div>
+      </div>
+
+      <div class="sec">
+        <div class="card goal"><div style="display:flex;justify-content:space-between;font-size:15px"><b>✈️&nbsp; Lissabon</b><span style="color:var(--muted)">€ 340 van € 600</span></div><div class="bar"><i id="d-goalbar" style="width:57%"></i></div><div style="font-size:13.5px;color:var(--muted)" id="d-goal"></div></div>
+      </div>
+
+      <div class="sec"><button class="link" data-sheet="why">Waarom zie ik dit?</button></div>
+      <p class="fine">Kate rekent met je vaste betalingen, je gewone uitgaven van de voorbije maanden en de keuzes hierboven. Het weer is een voorspelling, geen oordeel.</p>
+    </div>
+    <div class="sheet" id="sheet-why"><div class="in"><div class="grab"></div><h4>Waarom zie ik dit?</h4>
+      <ul class="why">
+        <li>Je loon komt meestal op de laatste werkdag binnen.</li>
+        <li>Vaste betalingen: gsm, energie, Spotify, fitness en je huurdersverzekering.</li>
+        <li>Vorig jaar kocht je rond 6 oktober een cadeau. Klopt het dat Sara jarig is?</li>
+        <li>Je geeft op een gewone dag ongeveer € 20 uit.</li>
+      </ul>
+      <div class="pills" style="margin-top:16px"><span class="pill sm">Klopt</span><span class="pill sm">Pas aan</span><span class="pill sm">Hier wil ik niets over horen</span></div>
+    </div></div>
+  </section>
+
+  <!-- ============ 3. LOCK ============ -->
+  <section class="screen lock" id="s-lock">
+    <div class="status"><span></span><span class="r">5G</span></div>
+    <div class="clock"><div class="dte">zaterdag 3 oktober</div><div class="tm">9:12</div></div>
+    <div class="notif" data-go="chat">
+      <span class="appic" data-i="kmarkw"></span>
+      <div><div class="h">KBC Mobile · Kate<span>nu</span></div>
+      <div class="b">Na regen komt zonneschijn ☀️ Gisteren was het onweer. Ik heb je week herschikt, vanaf morgen is het weer zon.</div></div>
+    </div>
+    <div class="lockhint">Tik op de melding</div>
+    <span class="home"></span>
+  </section>
+
+  <!-- ============ 4. CHAT ============ -->
+  <section class="screen" id="s-chat">
+    <div class="status"><span>9:12</span><span class="r">5G</span></div>
+    <div class="subhead"><button class="iconbtn" data-go="start" data-i="back"></button><h3>Kate</h3><button class="iconbtn" data-go="start" data-i="close"></button></div>
+    <div class="chatwrap" id="chat"></div>
+    <div class="input">Schrijf hier je vraag<span class="mic" data-i="mic"></span></div>
+    <span class="home"></span>
+  </section>
+
+  <!-- ============ 5. CODE ROOD ============ -->
+  <section class="screen" id="s-rood">
+    <div class="status"><span>14:47</span><span class="r">5G</span></div>
+    <div class="subhead"><button class="iconbtn" data-go="start" data-i="back"></button><h3>Overschrijving</h3><span class="iconbtn"></span></div>
+    <div class="scroll" style="padding-bottom:30px">
+      <div class="alertband">
+        <div class="h"><span data-i="stormsm"></span>Weerwaarschuwing code rood</div>
+        <h2>Jos, ik hou deze betaling even vast.</h2>
+        <p>Ze lijkt sterk op een bekende oplichting. Je geld is veilig, er is nog niets vertrokken.</p>
+      </div>
+      <div class="sec" style="padding-top:14px">
+        <div class="card" style="padding:6px 16px">
+          <div class="kv"><span>Bedrag</span><b>€ 2.450,00</b></div>
+          <div class="kv"><span>Naar</span><b>BE71 0961 2345 6769</b></div>
+          <div class="kv"><span>Naam die je ingaf</span><b>KBC Veiligheidsdienst</b></div>
+        </div>
+        <div class="shield"><span data-i="shield"></span><div><b>Naam komt niet overeen.</b> Deze rekening staat op naam van een privépersoon, niet van KBC.</div></div>
+      </div>
+      <div class="sec">
+        <div class="sechead"><h2>Wat Kate zag</h2></div>
+        <div class="card">
+          <div class="sig"><i></i>Je bent nu aan het bellen met een nummer dat niet van KBC is.</div>
+          <div class="sig"><i></i>Je hebt nooit eerder naar dit rekeningnummer betaald.</div>
+          <div class="sig"><i></i>Het bedrag is 30 keer hoger dan je gewone betalingen.</div>
+        </div>
+      </div>
+      <div class="sec">
+        <div class="card angel"><span class="avatar">E</span><div style="font-size:14.5px;line-height:1.45"><b>Els, je engelbewaarder, is verwittigd.</b><br><span style="color:var(--muted)">Zij en KBC Live kijken samen met je mee.</span></div></div>
+      </div>
+      <div class="stack">
+        <span class="pill fill">📞&nbsp; Bel KBC Live nu</span>
+        <span class="pill">Check je gesprek</span>
+        <span class="textbtn">Ik ken deze persoon, ik wil toch betalen</span>
+      </div>
+      <p class="fine" style="padding-top:0">KBC vraagt je nooit om geld over te schrijven naar een "veilige rekening". Hang op als iemand dat vraagt.</p>
+    </div>
+    <span class="home"></span>
+  </section>
+
+</div>
+</div>
+
+<script>
+/* ---------- icons ---------- */
+const S=(w,h,body,vb)=>`<svg width="${w}" height="${h}" viewBox="${vb||'0 0 24 24'}" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">${body}</svg>`;
+const I={
+ gear:S(26,26,'<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/>'),
+ search:S(20,20,'<circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/>'),
+ bell:S(26,26,'<path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.9 1.9 0 0 0 3.4 0"/>'),
+ kmark:`<svg width="10" height="10" viewBox="0 0 10 10"><rect x="1" y="2" width="8" height="1.4" rx=".7" fill="#1A9FE4"/><rect x="2.5" y="4.3" width="5" height="1.4" rx=".7" fill="#1A9FE4"/><rect x="1" y="6.6" width="8" height="1.4" rx=".7" fill="#1A9FE4"/></svg>`,
+ kmarkw:`<svg width="22" height="22" viewBox="0 0 10 10"><rect x="1" y="2" width="8" height="1.4" rx=".7" fill="#fff"/><rect x="2.5" y="4.3" width="5" height="1.4" rx=".7" fill="#fff"/><rect x="1" y="6.6" width="8" height="1.4" rx=".7" fill="#fff"/></svg>`,
+ wallet:S(20,20,'<path d="M4 7h14a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V7z"/><path d="M4 7l11-3v3"/><circle cx="16" cy="13.5" r=".8" fill="currentColor"/>'),
+ walletf:`<svg width="26" height="26" viewBox="0 0 24 24"><path d="M4 7h14a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V7z" fill="#fff"/><path d="M4 7l11-3v3" stroke="#fff" stroke-width="1.6" fill="none"/><circle cx="16" cy="13.5" r="1" fill="#141618"/></svg>`,
+ news:S(18,18,'<rect x="5" y="3" width="15" height="18" rx="1"/><path d="M5 7H3v12a2 2 0 0 0 2 2M9 7h7M9 11h7M9 15h5"/>'),
+ house:S(18,18,'<path d="M3 11 12 4l9 7"/><path d="M5 10v10h14V10"/>'),
+ sign:S(18,18,'<path d="M12 3v18M5 6h12l2 2-2 2H5zM19 13H7l-2 2 2 2h12z"/>'),
+ star:S(22,22,'<path d="m12 3 2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1-4.4-4.3 6.1-.9z"/>'),
+ plus:S(22,22,'<circle cx="12" cy="12" r="9"/><path d="M12 8v8M8 12h8"/>'),
+ hex:S(32,32,'<path d="M9 5l3-2 3 2v3l-3 2-3-2zM4 12l3-2 3 2v3l-3 2-3-2zM14 12l3-2 3 2v3l-3 2-3-2zM9 17l3-2 3 2v3l-3 2-3-2z"/>'),
+ coinsplus:`<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#10302A" stroke-width="1.5"><ellipse cx="10" cy="8" rx="6" ry="2.5"/><path d="M4 8v4c0 1.4 2.7 2.5 6 2.5s6-1.1 6-2.5V8M4 12v4c0 1.4 2.7 2.5 6 2.5s6-1.1 6-2.5v-4"/><path d="M19 3v4M17 5h4"/></svg>`,
+ coinsmin:`<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#231B00" stroke-width="1.5"><ellipse cx="10" cy="8" rx="6" ry="2.5"/><path d="M4 8v4c0 1.4 2.7 2.5 6 2.5s6-1.1 6-2.5V8M4 12v4c0 1.4 2.7 2.5 6 2.5s6-1.1 6-2.5v-4"/><path d="M17 5h4"/></svg>`,
+ swap:S(30,30,'<path d="M4 8h15M15 4l4 4-4 4M20 16H5M9 12l-4 4 4 4"/>'),
+ list:S(26,26,'<circle cx="4.5" cy="6" r="1.2"/><circle cx="4.5" cy="12" r="1.2"/><circle cx="4.5" cy="18" r="1.2"/><rect x="8" y="4.5" width="13" height="3" rx="1.5"/><rect x="8" y="10.5" width="13" height="3" rx="1.5"/><rect x="8" y="16.5" width="13" height="3" rx="1.5"/>'),
+ piggy:S(26,26,'<path d="M19 10c1 .4 2 1.4 2 2.5v1.5h-2c-.6 1.6-1.8 2.8-3 3.4V20h-3v-2h-3v2H7v-2.8A6.5 6.5 0 0 1 11.5 6c2.4 0 4.6 1.2 5.8 3z"/><path d="M13 4.5a2 2 0 0 1 3 1.5"/><circle cx="16" cy="11" r=".6" fill="currentColor"/>'),
+ layers:S(26,26,'<path d="m12 3 9 5-9 5-9-5z"/><path d="m3 12 9 5 9-5M3 16l9 5 9-5"/>'),
+ back:S(26,26,'<path d="M20 12H4M10 6l-6 6 6 6"/>'),
+ close:S(24,24,'<path d="M5 5l14 14M19 5 5 19"/>'),
+ info:S(24,24,'<circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/>'),
+ mic:S(22,22,'<rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/>'),
+ shield:`<svg width="22" height="22" viewBox="0 0 24 24"><path d="M12 3 4 6v6c0 5 3.4 8 8 9 4.6-1 8-4 8-9V6z" fill="#DC7507"/><path d="M12 8v5M12 16h.01" stroke="#231300" stroke-width="2" stroke-linecap="round"/></svg>`,
+ stormsm:`<svg width="22" height="22" viewBox="0 0 24 24"><path d="M7 16a4.5 4.5 0 1 1 1-8.9A6 6 0 0 1 19.5 9 3.5 3.5 0 0 1 18 16z" fill="#FFB4B0"/><path d="m13 13-3 5h3l-2 4" stroke="#D64040" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>`
+};
+document.querySelectorAll('[data-i]').forEach(e=>{e.insertAdjacentHTML('afterbegin',I[e.dataset.i]||'')});
+
+/* weather glyphs */
+const CL='M7 18a4.5 4.5 0 1 1 1-8.9A6 6 0 0 1 19.5 11 3.5 3.5 0 0 1 18 18z';
+function wxIcon(t,s){
+  s=s||28;
+  const sun=(cx,cy,r)=>`<g stroke="#E9C100" stroke-width="1.8" stroke-linecap="round">${[0,45,90,135,180,225,270,315].map(a=>{const x1=cx+Math.cos(a*Math.PI/180)*(r+2.5),y1=cy+Math.sin(a*Math.PI/180)*(r+2.5),x2=cx+Math.cos(a*Math.PI/180)*(r+5),y2=cy+Math.sin(a*Math.PI/180)*(r+5);return `<line x1="${x1.toFixed(1)}" y1="${y1.toFixed(1)}" x2="${x2.toFixed(1)}" y2="${y2.toFixed(1)}"/>`}).join('')}</g><circle cx="${cx}" cy="${cy}" r="${r}" fill="#E9C100"/>`;
+  let b='';
+  if(t==='zon') b=sun(12,12,5);
+  if(t==='bewolkt') b=sun(9,8.5,3.6)+`<path d="${CL}" fill="#C9D3DC" transform="translate(1.5 1.5) scale(.9)"/>`;
+  if(t==='regen') b=`<path d="${CL}" transform="translate(0 -3)" fill="#AFC0CF"/><path d="M8 18l-1 3M12 18l-1 3M16 18l-1 3" stroke="#74C8ED" stroke-width="1.8" stroke-linecap="round"/>`;
+  if(t==='donder') b=`<path d="${CL}" transform="translate(0 -3)" fill="#8997A5"/><path d="m13 12-3 5h3.5l-2 5" stroke="#F69D14" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>`;
+  if(t==='storm') b=`<path d="${CL}" transform="translate(0 -3)" fill="#5F6B77"/><path d="m13 12-3 5h3.5l-2 5" stroke="#D64040" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M7 17l-1.5 3M18 17l-1.5 3" stroke="#74C8ED" stroke-width="1.8" stroke-linecap="round"/>`;
+  if(t==='regenboog') b=`<path d="M3 17a9 9 0 0 1 18 0" stroke="#EE7079" stroke-width="1.8" fill="none"/><path d="M5.5 17a6.5 6.5 0 0 1 13 0" stroke="#E9C100" stroke-width="1.8" fill="none"/><path d="M8 17a4 4 0 0 1 8 0" stroke="#5BA215" stroke-width="1.8" fill="none"/><path d="M10.3 17a1.7 1.7 0 0 1 3.4 0" stroke="#74C8ED" stroke-width="1.8" fill="none"/>`;
+  return `<svg width="${s}" height="${s}" viewBox="0 0 24 24">${b}</svg>`;
+}
+const WXNAME={zon:'Zonnig',bewolkt:'Bewolkt',regen:'Regen',donder:'Onweer',storm:'Storm',regenboog:'Opklaringen'};
+
+/* ---------- model (fictief: Lotte, 23) ---------- */
+const START=new Date(Date.UTC(2026,9,2)); // vr 2 okt 2026
+const NDAYS=29;               // t/m do 29/10, loon op vr 30/10
+const BAL=1120, DAILY=20, BUFFER=100;
+const DN=['zo','ma','di','wo','do','vr','za'];
+const FIXED={3:[{n:'Gsm-abonnement',a:25}],4:[{n:'Cadeau Sara (verjaardag)',a:35}],5:[{n:'Voorschot energie',a:85}],6:[{n:'Spotify',a:12}],13:[{n:'Huurdersverzekering',a:48}],18:[{n:'Fitness',a:30}]};
+const state={uitgaan:false,gsm:false,sparen:true,sel:0};
+const day=i=>new Date(START.getTime()+i*864e5);
+const lbl=i=>{const d=day(i);return {dn:DN[d.getUTCDay()],dd:d.getUTCDate()+'/'+(d.getUTCMonth()+1)}};
+const eur=v=>'€ '+Math.round(v).toLocaleString('nl-BE');
+
+function model(st){
+  const ev=[...Array(NDAYS)].map((_,i)=>[...(FIXED[i]||[]).map(e=>({...e,k:'vast'}))]);
+  if(st.uitgaan) ev[0].push({n:'Uitgaan',a:60,k:'impuls'});
+  if(st.gsm) ev[8].push({n:'Nieuwe gsm',a:299,k:'groot'});
+  if(st.sparen) [7,14,21].forEach(i=>ev[i].push({n:'Naar Lissabon',a:25,k:'sparen'}));
+  const planned=ev.flat().reduce((s,e)=>s+e.a,0);
+  const vrij=(BAL-planned-BUFFER)/NDAYS;
+  let b=BAL; const path=[BAL];
+  for(let i=0;i<NDAYS;i++){b-=DAILY+ev[i].reduce((s,e)=>s+e.a,0);path.push(b)}
+  const low=Math.min(...path); const lowIdx=path.indexOf(low);
+  const wx=[];
+  for(let i=0;i<NDAYS;i++){
+    const e=ev[i], spend=e.filter(x=>x.k!=='sparen').reduce((s,x)=>s+x.a,0);
+    let t;
+    if(e.some(x=>x.k==='groot')) t= low<0?'storm':'regen';
+    else if(e.some(x=>x.k==='impuls')) t='donder';
+    else if(spend>=30) t='regen';
+    else if(i>0 && wx[i-1]==='donder') t='bewolkt';
+    else if(i>1 && wx[i-2]==='donder' && wx[i-1]==='bewolkt') t='regenboog';
+    else if(vrij<18) t='bewolkt';
+    else t='zon';
+    wx.push(t);
+  }
+  const redDay = path.findIndex((v,i)=>i>0&&v<0);
+  const weeksTo = st.sparen ? Math.ceil((600-340)/25) : null;
+  return {ev,vrij,path,low,wx,redDay,weeksTo};
+}
+
+function headline(m){
+  if(m.redDay>0){const l=lbl(m.redDay-1);return `Storm op zaterdag 10/10. Met die gsm sta je vanaf ${l.dd} in het rood.`}
+  if(state.uitgaan) return 'Vanavond onweer, maar na regen komt zonneschijn: zondag is het weer zon.';
+  return 'Een zonnige maand, met wat regen op 6 en 7 oktober.';
+}
+function dayText(m,i){
+  const t=m.wx[i], l=lbl(i), e=m.ev[i];
+  const s={
+    zon:'Geen grote uitgaven gepland. Geniet ervan.',
+    bewolkt: (i>0&&m.wx[i-1]==='donder')?'Een rustige dag na gisteren. Geen probleem, je week is al herschikt.':'Krap maar veilig. Kate stuurt vandaag niets.',
+    regen:'Een geplande uitgave. Je buffer vangt ze op.',
+    donder:'Een avond uit. Geen verwijt: Kate herschikt de dagen erna.',
+    storm:'Deze aankoop duwt je rekening voor het einde van de maand in het rood.',
+    regenboog:'Na regen komt zonneschijn: je zit weer op koers.'
+  }[t];
+  return `<b>${i===0?'Vandaag':(l.dn==='za'?'Zaterdag':l.dn==='zo'?'Zondag':l.dn)} ${l.dd} · ${WXNAME[t]}</b>${s}${e.length?'<ul>'+e.map(x=>`<li>${x.n}: ${eur(x.a)}</li>`).join('')+'</ul>':''}`;
+}
+
+/* ---------- render ---------- */
+const base=()=>model({uitgaan:false,gsm:false,sparen:state.sparen});
+function render(){
+  const m=model(state), b0=base();
+  // start card
+  document.getElementById('st-icon').innerHTML=wxIcon(m.wx[0],56);
+  document.getElementById('st-temp').textContent=eur(m.vrij);
+  document.getElementById('st-lbl').innerHTML=WXNAME[m.wx[0]]+'<small>vandaag</small>';
+  document.getElementById('st-head').textContent=headline(m);
+  document.getElementById('st-week').innerHTML=[...Array(7)].map((_,i)=>{const l=lbl(i);const tot=m.ev[i].filter(x=>x.k!=='sparen').reduce((s,x)=>s+x.a,0);return `<div><div class="dn ${i?'':'today'}">${i?l.dn:'nu'}</div>${wxIcon(m.wx[i],26)}<div class="amt">${tot?'-'+tot:''}</div></div>`}).join('');
+  const goal = m.weeksTo? `Met € 25 per week haal je het rond ${goalDate(m.weeksTo)}.` : 'Zonder vaste spaarbooster haal je het niet voor de zomer.';
+  document.getElementById('st-goal').textContent=goal;
+  // detail
+  document.getElementById('d-icon').innerHTML=wxIcon(m.redDay>0?'storm':m.wx[0],64);
+  document.getElementById('d-head').textContent=headline(m);
+  document.getElementById('d-temp').textContent=eur(m.vrij);
+  const dl=Math.round(m.vrij)-Math.round(b0.vrij), de=document.getElementById('d-delta');
+  de.textContent= dl? (dl>0?'+':'−')+'€'+Math.abs(dl):''; de.style.background= dl<0?'#3A2A12':'#1E3A14'; de.style.color= dl<0?'#FFA663':'#8CD656'; de.style.display=dl?'inline':'none';
+  const w=document.getElementById('d-warn');
+  if(m.redDay>0){w.classList.add('on');w.innerHTML=`<b>Kate:</b> Wacht je tot na je loon op 30/10, dan blijft het hele maand droog. Of spreid ik de aankoop over 3 maanden, zonder kosten? <div class="pills" style="margin:10px 0 0"><span class="pill sm">Stel uit tot na je loon</span><span class="pill sm">Toon opties</span></div>`}
+  else w.classList.remove('on');
+  document.getElementById('d-strip').innerHTML=[...Array(14)].map((_,i)=>{const l=lbl(i);const tot=m.ev[i].filter(x=>x.k!=='sparen').reduce((s,x)=>s+x.a,0);return `<div class="day ${state.sel===i?'sel':''}" data-day="${i}"><div class="dn">${i?l.dn:'vandaag'}</div><div class="dd">${l.dd}</div>${wxIcon(m.wx[i],30)}<div class="ev">${tot?'-€'+tot:''}</div></div>`}).join('');
+  document.getElementById('d-info').innerHTML=dayText(m,state.sel);
+  document.querySelectorAll('.toggle').forEach(t=>t.querySelector('.sw').classList.toggle('on',state[t.dataset.t]));
+  document.getElementById('d-goal').textContent=goal;
+  drawChart(m);
+}
+function goalDate(weeks){const d=new Date(START.getTime()+(7+weeks*7)*864e5);return ['januari','februari','maart','april','mei','juni','juli','augustus','september','oktober','november','december'][d.getUTCMonth()]}
+function drawChart(m){
+  const W=330,H=150,pad=10,max=1200,min=-300;
+  const X=i=>pad+i*(W-2*pad)/NDAYS, Y=v=>pad+(max-v)*(H-2*pad)/(max-min);
+  const pts=m.path.map((v,i)=>`${X(i).toFixed(1)},${Y(v).toFixed(1)}`);
+  const neg=m.low<0;
+  const col=neg?'#D64040':'#1A9FE4';
+  let s=`<defs><linearGradient id="g" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="${col}" stop-opacity=".35"/><stop offset="1" stop-color="${col}" stop-opacity="0"/></linearGradient></defs>`;
+  s+=`<line x1="${pad}" x2="${W-pad}" y1="${Y(0)}" y2="${Y(0)}" stroke="#4A5057" stroke-dasharray="3 4"/><text x="${pad}" y="${Y(0)+13}" font-size="10" fill="#A3AAB1">€ 0</text>`;
+  s+=`<path d="M${pts.join('L')}L${X(NDAYS)},${Y(min)}L${X(0)},${Y(min)}Z" fill="url(#g)"/>`;
+  s+=`<polyline points="${pts.join(' ')}" fill="none" stroke="${col}" stroke-width="2.4" stroke-linejoin="round"/>`;
+  s+=`<circle cx="${X(NDAYS)}" cy="${Y(m.path[NDAYS])}" r="4" fill="${col}"/><text x="${X(NDAYS)-6}" y="${Y(m.path[NDAYS])+(neg?-10:16)}" text-anchor="end" font-size="11" font-weight="700" fill="#F2F4F5">${eur(m.path[NDAYS])}</text>`;
+  document.getElementById('d-chart').innerHTML=s;
+}
+// In & uit bars (static)
+document.getElementById('bars').innerHTML=[[40,55],[62,48],[60,90],[58,50],[64,52],[0,26]].map(([a,b],i)=>`<div class="m"><i style="height:${a}px;background:${i===5?'#0E9E83':'#1E4A42'}"></i><i style="height:${b}px;background:${i===5?'#E9C100':'#5A4D12'}"></i></div>`).join('');
+
+/* ---------- chat ---------- */
+let chatTimer=[];
+function playChat(){
+  chatTimer.forEach(clearTimeout); chatTimer=[];
+  const before=model({uitgaan:false,gsm:false,sparen:state.sparen}), after=model({uitgaan:true,gsm:false,sparen:state.sparen});
+  const el=document.getElementById('chat');
+  const wk=[1,2,3,4,5].map(i=>{const l=lbl(i);const tot=after.ev[i].filter(x=>x.k!=='sparen').reduce((s,x)=>s+x.a,0);return `<div><small>${i===1?'vandaag':l.dn}</small>${wxIcon(after.wx[i],28)}<em>${tot?'-€'+tot:WXNAME[after.wx[i]].toLowerCase()}</em></div>`}).join('');
+  const parts=[
+    `<div class="chatday">Vandaag</div><div class="chatai">Vraag het aan Kate, je AI-assistent ✦</div>`,
+    `<div class="kav">${I.kmark}</div><div class="msg">Goeiemorgen Lotte ☀️</div>`,
+    `<div class="msg">Gisteren was het onweer, maar na regen komt zonneschijn. Ik heb je week al herschikt, je hoeft niets te doen.</div>`,
+    `<div class="mini"><div style="display:flex;justify-content:space-between;font-size:14.5px"><b>Je week</b><span style="color:var(--muted)">${eur(before.vrij)} → <b style="color:var(--text)">${eur(after.vrij)}</b> per dag</span></div><div class="mw">${wk}</div></div>`,
+    `<div class="msg">Je droom Lissabon blijft op schema. Vandaag iets rustiger, vanaf morgen weer zon.</div><div class="pills"><span class="pill sm" data-go="detail">Toon mijn weerbericht</span><span class="pill sm" data-sheet2>Waarom zie ik dit?</span><span class="pill sm">Geen ochtendberichten na uitgaan</span></div>`
+  ];
+  el.innerHTML='';
+  let t=150;
+  parts.forEach((p,i)=>{
+    if(i>=2){chatTimer.push(setTimeout(()=>{el.insertAdjacentHTML('beforeend','<div class="msg typing" id="typ"><span></span><span></span><span></span></div>')},t)); t+=700;}
+    chatTimer.push(setTimeout(()=>{const ty=document.getElementById('typ');if(ty)ty.remove();const d=document.createElement('div');d.className='appear';d.innerHTML=p;el.appendChild(d);bind(d);el.scrollTop=el.scrollHeight},t));
+    t+= i<2?250:500;
+  });
+}
+
+/* ---------- navigation ---------- */
+const ORDER=['start','detail','lock','chat','rood'];
+function go(s){
+  document.querySelectorAll('.screen').forEach(x=>x.classList.toggle('on',x.id==='s-'+s));
+  document.querySelectorAll('.panel .scene[data-go]').forEach(x=>x.classList.toggle('on',x.dataset.go===s));
+  document.querySelectorAll('.sheet').forEach(x=>x.classList.remove('on'));
+  const sc=document.querySelector('#s-'+s+' .scroll'); if(sc) sc.scrollTop=0;
+  if(s==='chat'){state.uitgaan=true;render();playChat()}
+}
+function bind(root){
+  root.querySelectorAll('[data-go]').forEach(e=>e.addEventListener('click',ev=>{ev.stopPropagation();go(e.dataset.go)}));
+  root.querySelectorAll('[data-sheet],[data-sheet2]').forEach(e=>e.addEventListener('click',ev=>{ev.stopPropagation();go('detail');document.getElementById('sheet-why').classList.add('on')}));
+}
+bind(document);
+document.querySelectorAll('.toggle').forEach(t=>t.addEventListener('click',()=>{state[t.dataset.t]=!state[t.dataset.t];if(t.dataset.t==='gsm'&&state.gsm)state.sel=8;if(t.dataset.t==='gsm'&&!state.gsm)state.sel=0;render()}));
+document.getElementById('d-strip').addEventListener('click',e=>{const d=e.target.closest('[data-day]');if(d){state.sel=+d.dataset.day;render()}});
+document.querySelectorAll('.sheet').forEach(s=>s.addEventListener('click',e=>{if(e.target===s)s.classList.remove('on')}));
+document.getElementById('reset').addEventListener('click',()=>{Object.assign(state,{uitgaan:false,gsm:false,sparen:true,sel:0});render();go('start')});
+addEventListener('keydown',e=>{const n=+e.key;if(n>=1&&n<=5)go(ORDER[n-1]);if(e.key==='r')document.getElementById('reset').click()});
+
+function fit(){const st=document.getElementById('stage');const h=innerHeight-40;const sc=Math.min(1,h/864, (innerWidth-24)/410);st.style.transform=`scale(${sc})`;if(innerWidth<=760){st.style.height=(864*sc)+'px';st.style.transformOrigin='top center'}}
+addEventListener('resize',fit);fit();
+render();go('start');
+</script>
+</body>
+</html>
