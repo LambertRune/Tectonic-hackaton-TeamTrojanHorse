@@ -1,0 +1,152 @@
+{
+  "KBC-Forecast/.claude/settings.json": {
+    "mtime": 1790791071.719814,
+    "seen": 1790793036.9300349,
+    "ast_hash": "dc580fca35a0e98ed20777ede5e545a1",
+    "semantic_hash": "dc580fca35a0e98ed20777ede5e545a1"
+  },
+  "KBC-Forecast/.vscode/extensions.json": {
+    "mtime": 1790791071.719814,
+    "seen": 1790793036.9300394,
+    "ast_hash": "b2354ba0225f5689d13651ec0fac0de0",
+    "semantic_hash": "b2354ba0225f5689d13651ec0fac0de0"
+  },
+  "KBC-Forecast/.vscode/settings.json": {
+    "mtime": 1790791071.7204175,
+    "seen": 1790793036.9300413,
+    "ast_hash": "6b9302c1f72c315e90233c7539c48c9f",
+    "semantic_hash": "6b9302c1f72c315e90233c7539c48c9f"
+  },
+  "KBC-Forecast/app.json": {
+    "mtime": 1790791071.7204175,
+    "seen": 1790793036.930043,
+    "ast_hash": "7b856214ab7f66b7bd972c9063a352f9",
+    "semantic_hash": "7b856214ab7f66b7bd972c9063a352f9"
+  },
+  "KBC-Forecast/assets/expo.icon/icon.json": {
+    "mtime": 1790791071.720642,
+    "seen": 1790793036.9300442,
+    "ast_hash": "35cb915a0bebbebbe69cf7815e174462",
+    "semantic_hash": "35cb915a0bebbebbe69cf7815e174462"
+  },
+  "KBC-Forecast/package.json": {
+    "mtime": 1790791071.723814,
+    "seen": 1790793036.9300451,
+    "ast_hash": "13daf4cf53cb81a7be305a119abf5fe0",
+    "semantic_hash": "13daf4cf53cb81a7be305a119abf5fe0"
+  },
+  "KBC-Forecast/scripts/reset-project.js": {
+    "mtime": 1790791071.723814,
+    "seen": 1790793036.9300473,
+    "ast_hash": "ca9d75cf60f51e7a2d67fd08ddfb8275",
+    "semantic_hash": "ca9d75cf60f51e7a2d67fd08ddfb8275"
+  },
+  "KBC-Forecast/src/app/_layout.tsx": {
+    "mtime": 1790791071.7243133,
+    "seen": 1790793036.9300628,
+    "ast_hash": "85c10ae1f47d901b36563b21c1cacc63",
+    "semantic_hash": "85c10ae1f47d901b36563b21c1cacc63"
+  },
+  "KBC-Forecast/src/app/explore.tsx": {
+    "mtime": 1790791071.7243662,
+    "seen": 1790793036.9300659,
+    "ast_hash": "42adf91e47cfe6b5d4ede54a35db24d0",
+    "semantic_hash": "42adf91e47cfe6b5d4ede54a35db24d0"
+  },
+  "KBC-Forecast/src/app/index.tsx": {
+    "mtime": 1790791071.7243662,
+    "seen": 1790793036.9300678,
+    "ast_hash": "c6dba393a45b6d4e24d2f0bb62d6c0bf",
+    "semantic_hash": "c6dba393a45b6d4e24d2f0bb62d6c0bf"
+  },
+  "KBC-Forecast/src/components/animated-icon.tsx": {
+    "mtime": 1790791071.7244742,
+    "seen": 1790793036.9300685,
+    "ast_hash": "46cea5b4aaa994fa61f8a3d1574b2ff8",
+    "semantic_hash": "46cea5b4aaa994fa61f8a3d1574b2ff8"
+  },
+  "KBC-Forecast/src/components/animated-icon.web.tsx": {
+    "mtime": 1790791071.7244742,
+    "seen": 1790793036.9300706,
+    "ast_hash": "2defa175163e104a6e2232436fa77e30",
+    "semantic_hash": "2defa175163e104a6e2232436fa77e30"
+  },
+  "KBC-Forecast/src/components/app-tabs.tsx": {
+    "mtime": 1790791071.7244742,
+    "seen": 1790793036.9300716,
+    "ast_hash": "7f9ddbb00991d090e67f4eeff23f89e8",
+    "semantic_hash": "7f9ddbb00991d090e67f4eeff23f89e8"
+  },
+  "KBC-Forecast/src/components/app-tabs.web.tsx": {
+    "mtime": 1790791071.7244742,
+    "seen": 1790793036.9300728,
+    "ast_hash": "d197b6fde1ead811d986e454f2e27064",
+    "semantic_hash": "d197b6fde1ead811d986e454f2e27064"
+  },
+  "KBC-Forecast/src/components/external-link.tsx": {
+    "mtime": 1790791071.7244742,
+    "seen": 1790793036.9300737,
+    "ast_hash": "a71bdc8e0bd55812a1e97662ade442d1",
+    "semantic_hash": "a71bdc8e0bd55812a1e97662ade442d1"
+  },
+  "KBC-Forecast/src/components/hint-row.tsx": {
+    "mtime": 1790791071.7244742,
+    "seen": 1790793036.930075,
+    "ast_hash": "1ac80baf6b0a5c3d8c1ea371d5a0dbc5",
+    "semantic_hash": "1ac80baf6b0a5c3d8c1ea371d5a0dbc5"
+  },
+  "KBC-Forecast/src/components/themed-text.tsx": {
+    "mtime": 1790791071.7244742,
+    "seen": 1790793036.9300766,
+    "ast_hash": "41869b896e1e9f3472f5c2183af58918",
+    "semantic_hash": "41869b896e1e9f3472f5c2183af58918"
+  },
+  "KBC-Forecast/src/components/themed-view.tsx": {
+    "mtime": 1790791071.7244742,
+    "seen": 1790793036.9300783,
+    "ast_hash": "f935dbbcf5a5067a417ea7b329727653",
+    "semantic_hash": "f935dbbcf5a5067a417ea7b329727653"
+  },
+  "KBC-Forecast/src/components/ui/collapsible.tsx": {
+    "mtime": 1790791071.7244742,
+    "seen": 1790793036.9300795,
+    "ast_hash": "24105f00e6631a1cb1daeaef9d4aa808",
+    "semantic_hash": "24105f00e6631a1cb1daeaef9d4aa808"
+  },
+  "KBC-Forecast/src/components/web-badge.tsx": {
+    "mtime": 1790791071.7244742,
+    "seen": 1790793036.9300804,
+    "ast_hash": "6d02b3c146c2ed6a3d3b7b8764e17602",
+    "semantic_hash": "6d02b3c146c2ed6a3d3b7b8764e17602"
+  },
+  "KBC-Forecast/src/constants/theme.ts": {
+    "mtime": 1790791071.7244742,
+    "seen": 1790793036.9300818,
+    "ast_hash": "9507bd7aa3ee042af2ad8a99ebbaa8b6",
+    "semantic_hash": "9507bd7aa3ee042af2ad8a99ebbaa8b6"
+  },
+  "KBC-Forecast/src/hooks/use-color-scheme.ts": {
+    "mtime": 1790791071.7244742,
+    "seen": 1790793036.9300828,
+    "ast_hash": "6f3444fcb9c7013a839a7832be518831",
+    "semantic_hash": "6f3444fcb9c7013a839a7832be518831"
+  },
+  "KBC-Forecast/src/hooks/use-color-scheme.web.ts": {
+    "mtime": 1790791071.724875,
+    "seen": 1790793036.9300845,
+    "ast_hash": "071fbb9a1a05ffb8af4b7d3b1ffa72d6",
+    "semantic_hash": "071fbb9a1a05ffb8af4b7d3b1ffa72d6"
+  },
+  "KBC-Forecast/src/hooks/use-theme.ts": {
+    "mtime": 1790791071.724875,
+    "seen": 1790793036.9300857,
+    "ast_hash": "e058af4f5801bcaa97dad62f12085a27",
+    "semantic_hash": "e058af4f5801bcaa97dad62f12085a27"
+  },
+  "KBC-Forecast/tsconfig.json": {
+    "mtime": 1790791071.724875,
+    "seen": 1790793036.9300866,
+    "ast_hash": "6794be22dd9dd00003515895d3b4ff06",
+    "semantic_hash": "6794be22dd9dd00003515895d3b4ff06"
+  }
+}

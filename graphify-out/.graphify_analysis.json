@@ -1,0 +1,368 @@
+{
+  "communities": {
+    "0": [
+      "kbc_forecast_app",
+      "kbc_forecast_app_adaptiveicon_backgroundcolor",
+      "kbc_forecast_app_adaptiveicon_backgroundimage",
+      "kbc_forecast_app_adaptiveicon_foregroundimage",
+      "kbc_forecast_app_adaptiveicon_monochromeimage",
+      "kbc_forecast_app_android_adaptiveicon",
+      "kbc_forecast_app_android_predictivebackgestureenabled",
+      "kbc_forecast_app_experiments_reactcompiler",
+      "kbc_forecast_app_experiments_typedroutes",
+      "kbc_forecast_app_expo",
+      "kbc_forecast_app_expo_android",
+      "kbc_forecast_app_expo_experiments",
+      "kbc_forecast_app_expo_icon",
+      "kbc_forecast_app_expo_ios",
+      "kbc_forecast_app_expo_name",
+      "kbc_forecast_app_expo_orientation",
+      "kbc_forecast_app_expo_plugins",
+      "kbc_forecast_app_expo_scheme",
+      "kbc_forecast_app_expo_slug",
+      "kbc_forecast_app_expo_userinterfacestyle",
+      "kbc_forecast_app_expo_version",
+      "kbc_forecast_app_expo_web",
+      "kbc_forecast_app_ios_icon",
+      "kbc_forecast_app_web_favicon",
+      "kbc_forecast_app_web_output"
+    ],
+    "1": [
+      "kbc_forecast_package_dependencies",
+      "kbc_forecast_package_dependencies_expo",
+      "kbc_forecast_package_dependencies_expo_constants",
+      "kbc_forecast_package_dependencies_expo_device",
+      "kbc_forecast_package_dependencies_expo_font",
+      "kbc_forecast_package_dependencies_expo_glass_effect",
+      "kbc_forecast_package_dependencies_expo_image",
+      "kbc_forecast_package_dependencies_expo_linking",
+      "kbc_forecast_package_dependencies_expo_router",
+      "kbc_forecast_package_dependencies_expo_splash_screen",
+      "kbc_forecast_package_dependencies_expo_status_bar",
+      "kbc_forecast_package_dependencies_expo_symbols",
+      "kbc_forecast_package_dependencies_expo_system_ui",
+      "kbc_forecast_package_dependencies_expo_ui",
+      "kbc_forecast_package_dependencies_expo_web_browser",
+      "kbc_forecast_package_dependencies_react",
+      "kbc_forecast_package_dependencies_react_dom",
+      "kbc_forecast_package_dependencies_react_native",
+      "kbc_forecast_package_dependencies_react_native_gesture_handler",
+      "kbc_forecast_package_dependencies_react_native_reanimated",
+      "kbc_forecast_package_dependencies_react_native_safe_area_context",
+      "kbc_forecast_package_dependencies_react_native_screens",
+      "kbc_forecast_package_dependencies_react_native_web",
+      "kbc_forecast_package_dependencies_react_native_worklets"
+    ],
+    "2": [
+      "kbc_forecast_package",
+      "kbc_forecast_package_devdependencies",
+      "kbc_forecast_package_devdependencies_types_react",
+      "kbc_forecast_package_devdependencies_typescript",
+      "kbc_forecast_package_main",
+      "kbc_forecast_package_name",
+      "kbc_forecast_package_private",
+      "kbc_forecast_package_version",
+      "ref_expo_constants",
+      "ref_expo_font",
+      "ref_expo_glass_effect",
+      "ref_expo_linking",
+      "ref_expo_status_bar",
+      "ref_expo_system_ui",
+      "ref_expo_ui",
+      "ref_react_dom",
+      "ref_react_native_gesture_handler",
+      "ref_react_native_screens",
+      "ref_react_native_web",
+      "ref_types_react",
+      "ref_typescript"
+    ],
+    "3": [
+      "kbc_forecast_src_app_layout",
+      "kbc_forecast_src_app_layout_tablayout",
+      "kbc_forecast_src_components_animated_icon",
+      "kbc_forecast_src_components_animated_icon_animatedicon",
+      "kbc_forecast_src_components_animated_icon_animatedsplashoverlay",
+      "kbc_forecast_src_components_animated_icon_glowkeyframe",
+      "kbc_forecast_src_components_animated_icon_keyframe",
+      "kbc_forecast_src_components_animated_icon_logokeyframe",
+      "kbc_forecast_src_components_animated_icon_styles",
+      "kbc_forecast_src_components_app_tabs",
+      "kbc_forecast_src_components_app_tabs_apptabs",
+      "kbc_forecast_src_components_external_link",
+      "kbc_forecast_src_components_external_link_props",
+      "kbc_forecast_src_hooks_use_color_scheme_web",
+      "kbc_forecast_src_hooks_use_color_scheme_web_usecolorscheme",
+      "ref_expo_router",
+      "ref_expo_splash_screen",
+      "ref_expo_web_browser",
+      "ref_react",
+      "ref_react_native",
+      "ref_react_native_worklets"
+    ],
+    "4": [
+      "kbc_forecast_src_components_themed_text",
+      "kbc_forecast_src_components_themed_text_styles",
+      "kbc_forecast_src_components_themed_text_themedtextprops",
+      "kbc_forecast_src_components_themed_view",
+      "kbc_forecast_src_components_themed_view_themedviewprops",
+      "kbc_forecast_src_constants_theme",
+      "kbc_forecast_src_constants_theme_bottomtabinset",
+      "kbc_forecast_src_constants_theme_colors",
+      "kbc_forecast_src_constants_theme_fonts",
+      "kbc_forecast_src_constants_theme_maxcontentwidth",
+      "kbc_forecast_src_constants_theme_themecolor",
+      "kbc_forecast_src_global",
+      "kbc_forecast_src_hooks_use_color_scheme",
+      "kbc_forecast_src_hooks_use_color_scheme_usecolorscheme",
+      "kbc_forecast_src_hooks_use_theme"
+    ],
+    "5": [
+      "kbc_forecast_scripts_reset_project",
+      "kbc_forecast_scripts_reset_project_exampledirpath",
+      "kbc_forecast_scripts_reset_project_fs",
+      "kbc_forecast_scripts_reset_project_movedirectories",
+      "kbc_forecast_scripts_reset_project_olddirs",
+      "kbc_forecast_scripts_reset_project_path",
+      "kbc_forecast_scripts_reset_project_readline",
+      "kbc_forecast_scripts_reset_project_rl",
+      "kbc_forecast_scripts_reset_project_root",
+      "ref_fs",
+      "ref_path",
+      "ref_readline"
+    ],
+    "6": [
+      "kbc_forecast_src_app_explore",
+      "kbc_forecast_src_app_explore_styles",
+      "kbc_forecast_src_app_explore_tabtwoscreen",
+      "kbc_forecast_src_components_themed_view_themedview",
+      "kbc_forecast_src_components_ui_collapsible",
+      "kbc_forecast_src_components_ui_collapsible_collapsible",
+      "kbc_forecast_src_components_ui_collapsible_styles",
+      "kbc_forecast_src_hooks_use_theme_usetheme",
+      "ref_expo_symbols"
+    ],
+    "7": [
+      "kbc_forecast_src_app_index",
+      "kbc_forecast_src_app_index_getdevmenuhint",
+      "kbc_forecast_src_app_index_homescreen",
+      "kbc_forecast_src_app_index_styles",
+      "kbc_forecast_src_components_hint_row_hintrow",
+      "kbc_forecast_src_components_themed_text_themedtext",
+      "kbc_forecast_src_components_web_badge_webbadge",
+      "ref_expo_device",
+      "ref_react_native_safe_area_context"
+    ],
+    "8": [
+      "kbc_forecast_src_components_animated_icon_module",
+      "kbc_forecast_src_components_animated_icon_web",
+      "kbc_forecast_src_components_animated_icon_web_animatedicon",
+      "kbc_forecast_src_components_animated_icon_web_animatedsplashoverlay",
+      "kbc_forecast_src_components_animated_icon_web_glowkeyframe",
+      "kbc_forecast_src_components_animated_icon_web_keyframe",
+      "kbc_forecast_src_components_animated_icon_web_logokeyframe",
+      "kbc_forecast_src_components_animated_icon_web_styles",
+      "ref_react_native_reanimated"
+    ],
+    "9": [
+      "kbc_forecast_tsconfig",
+      "kbc_forecast_tsconfig_compileroptions",
+      "kbc_forecast_tsconfig_compileroptions_paths",
+      "kbc_forecast_tsconfig_compileroptions_strict",
+      "kbc_forecast_tsconfig_extends",
+      "kbc_forecast_tsconfig_include",
+      "kbc_forecast_tsconfig_paths_assets",
+      "ref_expo_tsconfig_base"
+    ],
+    "10": [
+      "kbc_forecast_package_scripts",
+      "kbc_forecast_package_scripts_android",
+      "kbc_forecast_package_scripts_ios",
+      "kbc_forecast_package_scripts_lint",
+      "kbc_forecast_package_scripts_reset_project",
+      "kbc_forecast_package_scripts_start",
+      "kbc_forecast_package_scripts_web"
+    ],
+    "11": [
+      "kbc_forecast_src_components_app_tabs_web",
+      "kbc_forecast_src_components_app_tabs_web_apptabs",
+      "kbc_forecast_src_components_app_tabs_web_customtablist",
+      "kbc_forecast_src_components_app_tabs_web_styles",
+      "kbc_forecast_src_components_app_tabs_web_tabbutton",
+      "kbc_forecast_src_components_external_link_externallink"
+    ],
+    "12": [
+      "kbc_forecast_src_components_hint_row",
+      "kbc_forecast_src_components_hint_row_hintrowprops",
+      "kbc_forecast_src_components_hint_row_styles",
+      "kbc_forecast_src_constants_theme_spacing"
+    ],
+    "13": [
+      "kbc_forecast_src_components_web_badge",
+      "kbc_forecast_src_components_web_badge_styles",
+      "ref_expo",
+      "ref_expo_image"
+    ]
+  },
+  "cohesion": {
+    "0": 0.08,
+    "1": 0.08333333333333333,
+    "2": 0.09523809523809523,
+    "3": 0.14285714285714285,
+    "4": 0.19047619047619047,
+    "5": 0.16666666666666666,
+    "6": 0.5,
+    "7": 0.4166666666666667,
+    "8": 0.2222222222222222,
+    "9": 0.25,
+    "10": 0.2857142857142857,
+    "11": 0.5333333333333333,
+    "12": 0.5,
+    "13": 0.5
+  },
+  "gods": [
+    {
+      "id": "kbc_forecast_src_components_themed_text_themedtext",
+      "label": "ThemedText()",
+      "degree": 16
+    },
+    {
+      "id": "ref_react_native",
+      "label": "react-native",
+      "degree": 16
+    },
+    {
+      "id": "kbc_forecast_src_components_themed_view_themedview",
+      "label": "ThemedView()",
+      "degree": 15
+    },
+    {
+      "id": "kbc_forecast_app_expo",
+      "label": "expo",
+      "degree": 13
+    },
+    {
+      "id": "kbc_forecast_src_hooks_use_theme_usetheme",
+      "label": "useTheme()",
+      "degree": 9
+    },
+    {
+      "id": "kbc_forecast_src_app_explore_tabtwoscreen",
+      "label": "TabTwoScreen()",
+      "degree": 7
+    },
+    {
+      "id": "kbc_forecast_src_app_index_homescreen",
+      "label": "HomeScreen()",
+      "degree": 7
+    },
+    {
+      "id": "kbc_forecast_src_components_web_badge_webbadge",
+      "label": "WebBadge()",
+      "degree": 7
+    },
+    {
+      "id": "kbc_forecast_package_scripts",
+      "label": "scripts",
+      "degree": 7
+    },
+    {
+      "id": "kbc_forecast_src_constants_theme_spacing",
+      "label": "Spacing",
+      "degree": 7
+    }
+  ],
+  "surprises": [
+    {
+      "source": "CustomTabList()",
+      "target": "ThemedText()",
+      "source_files": [
+        "KBC-Forecast/src/components/app-tabs.web.tsx",
+        "KBC-Forecast/src/components/themed-text.tsx"
+      ],
+      "confidence": "EXTRACTED",
+      "relation": "calls",
+      "why": "bridges separate communities"
+    },
+    {
+      "source": "CustomTabList()",
+      "target": "ThemedView()",
+      "source_files": [
+        "KBC-Forecast/src/components/app-tabs.web.tsx",
+        "KBC-Forecast/src/components/themed-view.tsx"
+      ],
+      "confidence": "EXTRACTED",
+      "relation": "calls",
+      "why": "bridges separate communities"
+    },
+    {
+      "source": "TabButton()",
+      "target": "ThemedText()",
+      "source_files": [
+        "KBC-Forecast/src/components/app-tabs.web.tsx",
+        "KBC-Forecast/src/components/themed-text.tsx"
+      ],
+      "confidence": "EXTRACTED",
+      "relation": "calls",
+      "why": "bridges separate communities"
+    },
+    {
+      "source": "TabButton()",
+      "target": "ThemedView()",
+      "source_files": [
+        "KBC-Forecast/src/components/app-tabs.web.tsx",
+        "KBC-Forecast/src/components/themed-view.tsx"
+      ],
+      "confidence": "EXTRACTED",
+      "relation": "calls",
+      "why": "bridges separate communities"
+    },
+    {
+      "source": "TabTwoScreen()",
+      "target": "ExternalLink()",
+      "source_files": [
+        "KBC-Forecast/src/app/explore.tsx",
+        "KBC-Forecast/src/components/external-link.tsx"
+      ],
+      "confidence": "EXTRACTED",
+      "relation": "calls",
+      "why": "bridges separate communities"
+    }
+  ],
+  "questions": [
+    {
+      "type": "bridge_node",
+      "question": "Why does `dependencies` connect `Community 1` to `Community 2`?",
+      "why": "High betweenness centrality (0.179) - this node is a cross-community bridge."
+    },
+    {
+      "type": "bridge_node",
+      "question": "Why does `react-native` connect `Community 3` to `Community 2`, `Community 4`, `Community 6`, `Community 7`, `Community 8`, `Community 11`, `Community 12`, `Community 13`?",
+      "why": "High betweenness centrality (0.151) - this node is a cross-community bridge."
+    },
+    {
+      "type": "bridge_node",
+      "question": "Why does `scripts` connect `Community 10` to `Community 2`?",
+      "why": "High betweenness centrality (0.050) - this node is a cross-community bridge."
+    },
+    {
+      "type": "isolated_nodes",
+      "question": "What connects `HintRowProps`, `Props`, `ThemedTextProps` to the rest of the system?",
+      "why": "97 weakly-connected nodes found - possible documentation gaps or missing edges."
+    },
+    {
+      "type": "low_cohesion",
+      "question": "Should `Community 0` be split into smaller, more focused modules?",
+      "why": "Cohesion score 0.08 - nodes in this community are weakly interconnected."
+    },
+    {
+      "type": "low_cohesion",
+      "question": "Should `Community 1` be split into smaller, more focused modules?",
+      "why": "Cohesion score 0.08333333333333333 - nodes in this community are weakly interconnected."
+    },
+    {
+      "type": "low_cohesion",
+      "question": "Should `Community 2` be split into smaller, more focused modules?",
+      "why": "Cohesion score 0.09523809523809523 - nodes in this community are weakly interconnected."
+    }
+  ]
+}

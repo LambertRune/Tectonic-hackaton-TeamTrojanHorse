@@ -32,3 +32,6 @@ google-services.json
 
 # Android Profiling
 *.hprof
+
+# graphify local cost log
+graphify-out/cost.json
